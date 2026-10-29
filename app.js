@@ -51,7 +51,7 @@
     }
   };
 
-  const DEFAULTS = { childName: 'Bento', guideName: 'Super Amigo', guideEmoji: '🦸', clubName: 'Clube da Missão', perDay: 3, voice: true, sound: true };
+  const DEFAULTS = { childName: 'Bento', guideName: 'Super Amigo', guideEmoji: '🦸', clubName: 'Clube da Missão', perDay: 3, voiceName: '', voice: true, sound: true };
   const GUIDES = ['🦸', '🐶', '🐻', '🦁', '🦖', '🚀', '⚽', '🤖'];
 
   let settings = Object.assign({}, DEFAULTS, store.get('settings', {}));
@@ -94,11 +94,24 @@
   };
 
   let ptVoice = null;
+  function scoreVoice(v) {
+    const n = (v.name || '').toLowerCase();
+    let s;
+    if (/^pt[-_]br/i.test(v.lang)) s = 50; else if (/^pt/i.test(v.lang)) s = 20; else return -1;
+    if (/natural|neural|online|premium|enhanced|aprimorad|wavenet|studio/.test(n)) s += 40;
+    if (/google/.test(n)) s += 25;
+    if (v.localService === false) s += 10;
+    if (/compact|espeak/.test(n)) s -= 30;
+    return s;
+  }
+  const ptVoices = () => {
+    try { return window.speechSynthesis.getVoices().filter(v => scoreVoice(v) >= 0).sort((a, b) => scoreVoice(b) - scoreVoice(a)); } catch (e) { return []; }
+  };
   const hasTTS = () => typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance !== 'undefined';
   function loadVoice() {
     try {
-      const vs = window.speechSynthesis.getVoices();
-      ptVoice = vs.find(v => /^pt[-_]BR/i.test(v.lang)) || vs.find(v => /^pt/i.test(v.lang)) || null;
+      const vs = ptVoices();
+      ptVoice = vs.find(v => v.name === settings.voiceName) || vs[0] || null;
     } catch (e) { /* ignora */ }
   }
   if (hasTTS()) {
@@ -108,10 +121,11 @@
   function say(text) {
     if (!settings.voice || !hasTTS()) return;
     try {
+      if (!ptVoice) loadVoice();
       window.speechSynthesis.cancel();
       const u = new window.SpeechSynthesisUtterance(text);
       u.lang = 'pt-BR'; if (ptVoice) u.voice = ptVoice;
-      u.rate = 0.9; u.pitch = 1.1;
+      u.rate = 0.92; u.pitch = 1.0; // pitch alterado soa mais robótico
       window.speechSynthesis.speak(u);
     } catch (e) { /* ignora */ }
   }
@@ -340,7 +354,7 @@
   MISSIONS.letras = {
     id: 'letras', emoji: '🔎', title: 'Caça-letras',
     run(c) {
-      const L = c.level, rounds = 4;
+      const L = c.level, rounds = [0, 6, 7, 8][L];
       const cfg = [null, { cols: 3, cells: 9, t: 2 }, { cols: 3, cells: 12, t: 3 }, { cols: 4, cells: 16, t: 4 }][L];
       const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
       const CONF = { B: 'DPR', D: 'BOP', P: 'BRF', Q: 'OGP', M: 'NW', N: 'MZH', W: 'MV', E: 'FL', F: 'EP', O: 'QCD', A: 'VH', S: 'ZC', V: 'UW', U: 'VO', L: 'IT', T: 'IL', R: 'BP', G: 'CQ', C: 'GO', H: 'NA' };
@@ -382,7 +396,7 @@
   MISSIONS.memoria = {
     id: 'memoria', emoji: '🃏', title: 'Memória',
     run(c) {
-      const n = [0, 3, 4, 6][c.level], cols = n === 3 ? 3 : 4;
+      const n = [0, 4, 6, 8][c.level], cols = 4;
       const faces = pick(EMO, n);
       const deck = shuffle([...faces, ...faces]).map((f, i) => ({ f, i, up: false, done: false, seen: false, el: null }));
       let first = null, lock = false, matched = 0;
@@ -464,7 +478,7 @@
       const SHORT = ['GOL', 'SOL', 'LUA', 'UVA', 'PAI', 'REI', 'BOI'];
       const LONG = ['BOLA', 'PATO', 'GATO', 'CASA', 'FOCA', 'DEDO', 'AMIGO', 'BANANA'];
       const IMG = { GOL: '🥅', SOL: '☀️', LUA: '🌙', UVA: '🍇', PAI: '👨', REI: '👑', BOI: '🐂', BOLA: '⚽', PATO: '🦆', GATO: '🐱', CASA: '🏠', FOCA: '🦭', DEDO: '☝️', AMIGO: '🤝', BANANA: '🍌' };
-      const words = [name, ...pick(L === 1 ? SHORT : LONG, 2)];
+      const words = [name, ...pick(L === 1 ? SHORT : LONG, 3), name];
       function round(i) {
         if (i >= words.length) return c.finish();
         c.progress(i, words.length);
@@ -486,9 +500,9 @@
       const L = c.level;
       const rng = (a, b) => Array.from({ length: b - a + 1 }, (_, k) => a + k);
       const rounds = [null,
-        [rng(1, 4), rng(1, 5), rng(1, 5)],
-        [rng(1, 6), rng(1, 8), rng(4, 9)],
-        [rng(1, 10), rng(1, 5).reverse(), rng(1, 8).reverse()]][L];
+        [rng(1, 4), rng(1, 5), rng(1, 5), rng(2, 6), rng(1, 6)],
+        [rng(1, 6), rng(1, 8), rng(4, 9), rng(3, 8), rng(1, 9)],
+        [rng(1, 10), rng(1, 5).reverse(), rng(1, 8).reverse(), rng(1, 10), rng(1, 6).reverse(), rng(5, 10).reverse()]][L];
       function round(i) {
         if (i >= rounds.length) return c.finish();
         c.progress(i, rounds.length);
@@ -507,7 +521,7 @@
   MISSIONS.contar = {
     id: 'contar', emoji: '⚽', title: 'Conta as bolas',
     run(c) {
-      const [lo, hi] = [null, [1, 5], [3, 8], [5, 12]][c.level], rounds = 5;
+      const [lo, hi] = [null, [1, 5], [3, 8], [5, 12]][c.level], rounds = 8;
       const ITEM = ['⚽', '🚀', '⭐', '🍎', '🐶', '🌙'];
       let last = 0;
       function round(i) {
@@ -558,7 +572,7 @@
     id: 'mestre', emoji: '🚦', title: 'Seu mestre mandou',
     run(c) {
       const L = c.level;
-      const rounds = [0, 6, 8, 10][L], waitMs = [0, 3500, 3000, 2500][L];
+      const rounds = [0, 8, 10, 12][L], waitMs = [0, 3500, 3000, 2500][L];
       const noGo = Math.max(1, Math.round(rounds * [0, 0.25, 0.33, 0.4][L]));
       const plan = Array(rounds).fill(true);
       pick(Array.from({ length: rounds - 1 }, (_, k) => k + 1), noGo).forEach(i => { plan[i] = false; });
@@ -595,9 +609,13 @@
   MISSIONS.sequencia = {
     id: 'sequencia', emoji: '💡', title: 'Luzes mágicas',
     run(c) {
-      const base = [0, 2, 3, 4][c.level], lens = [base, base, base + 1];
+      const base = [0, 2, 3, 4][c.level], lens = [base, base, base + 1, base + 1, base + 1];
+      const STEP = 1000, LIT = 550, DEBOUNCE = 300;
       const FREQ = [262, 330, 392, 523];
-      let seq = [], pos = 0, inputOn = false, attempts = 0, ri = 0;
+      let seq = [], pos = 0, inputOn = false, attempts = 0, ri = 0, lastPress = 0;
+      const padTimer = [];
+      // nunca repete a mesma luz em sequência (ficava parecendo uma só)
+      const makeSeq = n => { const s = []; while (s.length < n) { const k = rand(4); if (k !== s[s.length - 1]) s.push(k); } return s; };
       const status = h('div', { class: 'status' }, '👀');
       const pads = FREQ.map((f, k) => {
         const b = h('button', { class: 'pad p' + k, type: 'button', 'aria-label': 'Luz ' + (k + 1) });
@@ -605,25 +623,29 @@
         return b;
       });
       c.stage.replaceChildren(status, h('div', { class: 'pads' }, pads));
-      function light(k, ms = 420) {
+      function light(k, ms = LIT) {
+        clearTimeout(padTimer[k]);
         pads[k].classList.add('lit'); tone(FREQ[k], ms / 1000, 'triangle', 0.2);
-        c.timeout(() => pads[k].classList.remove('lit'), ms);
+        padTimer[k] = c.timeout(() => pads[k].classList.remove('lit'), ms);
       }
       function play() {
         inputOn = false; pos = 0; status.textContent = '👀';
-        seq.forEach((k, idx) => c.timeout(() => light(k), 800 + idx * 700));
-        c.timeout(() => { inputOn = true; status.textContent = '👆'; }, 800 + seq.length * 700);
+        seq.forEach((k, idx) => c.timeout(() => light(k), 900 + idx * STEP));
+        c.timeout(() => { inputOn = true; status.textContent = '👆'; lastPress = 0; }, 900 + seq.length * STEP);
       }
       function nextRound() {
         if (ri >= lens.length) return c.finish();
         c.progress(ri, lens.length);
-        seq = Array.from({ length: lens[ri] }, () => rand(4));
+        seq = makeSeq(lens[ri]);
         ri++; attempts = 0;
         c.say('Olha as luzes e repete!');
         play();
       }
       function press(k) {
         if (!inputOn) return;
+        const now = Date.now();
+        if (now - lastPress < DEBOUNCE) return; // ignora toque duplo sem querer
+        lastPress = now;
         light(k, 250);
         if (k === seq[pos]) {
           c.ok(); pos++;
@@ -693,6 +715,9 @@
       const fClub = inp({ type: 'text', maxlength: 24, value: settings.clubName });
       const fPer = inp({ type: 'number', min: 1, max: 5, inputmode: 'numeric', value: settings.perDay });
       const fVoice = inp({ type: 'checkbox', checked: settings.voice });
+      const voices = ptVoices();
+      const fVoiceName = sel([['', 'Automática (melhor disponível)'], ...voices.map(v => [v.name, `${v.name} (${v.lang})`])], settings.voiceName);
+      const testVoice = () => { settings.voiceName = fVoiceName.value; loadVoice(); say(`Oi, ${fName.value.trim() || DEFAULTS.childName}! Vamos brincar?`); };
       const fSound = inp({ type: 'checkbox', checked: settings.sound });
       const avatarBtns = GUIDES.map(g => {
         const b = h('button', { class: 'av' + (g === guideSel ? ' on' : ''), type: 'button', 'aria-label': 'Guia ' + g }, g);
@@ -709,8 +734,10 @@
           clubName: fClub.value.trim() || DEFAULTS.clubName,
           guideEmoji: guideSel,
           perDay: clamp(parseInt(fPer.value, 10) || DEFAULTS.perDay, 1, 5),
+          voiceName: fVoiceName.value,
           voice: fVoice.checked, sound: fSound.checked
         });
+        loadVoice();
         store.set('settings', settings);
         Object.values(MISSIONS).forEach(m => {
           const v = clamp(parseInt(lvSel[m.id].value, 10) || 1, 1, 3);
@@ -774,6 +801,8 @@
         h('div', { class: 'row' }, avatarBtns),
         lab('Missões por dia (1 a 5)', fPer),
         h('div', { class: 'checks' }, h('label', null, fVoice, 'Voz'), h('label', null, fSound, 'Sons')),
+        voices.length ? lab('Voz do guia', fVoiceName) : h('p', { class: 'note' }, 'Nenhuma voz em português encontrada neste aparelho. Instale uma voz pt-BR nas configurações de acessibilidade/voz do sistema.'),
+        voices.length ? h('div', { class: 'row' }, h('button', { class: 'btn alt', type: 'button', onclick: testVoice }, '🔊 Testar voz')) : null,
         h('h2', null, 'Níveis (ajuste manual)'),
         Object.values(MISSIONS).map(m => lab(`${m.emoji} ${m.title}`, lvSel[m.id])),
         h('div', { class: 'row' }, h('button', { class: 'btn', type: 'button', onclick: saveSettings }, 'Salvar configurações')),

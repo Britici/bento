@@ -1,6 +1,6 @@
 /* Service worker: funciona offline. Estratégia: cache primeiro, atualiza em segundo plano.
    Ao publicar mudanças, a nova versão aparece na SEGUNDA abertura do app. */
-const CACHE = 'mdn-v1';
+const CACHE = 'mdn-v2';
 const ASSETS = [
   './', './index.html', './style.css', './app.js', './manifest.webmanifest',
   './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'
