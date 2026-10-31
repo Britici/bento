@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#e9f5ff">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>Cantinho dos Jogos</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: cada tela ocupa a página inteira; a área de jogo tem tamanho fixo e nunca muda durante a partida. */
+:root {
+  --bg: #e9f5ff;
+  --ink: #1d2b4a;
+  --ink-soft: #55678a;
+  --tile: #ffffff;
+  --tile-edge: #cfe3f5;
+  --star: #5b5ce6;
+  --ball: #12a9a0;
+  --accent: #ff6b57;
+  --accent-ink: #ffffff;
+  --win: #fff2c2;
+  --paper: #ffffff;
+  --sky-a: #b9e3ff;
+  --sky-b: #eaf8ff;
+  --font: "Fredoka", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14203a; --ink: #f1f6ff; --ink-soft: #a9b9d8; --tile: #22325a; --tile-edge: #2f4478;
+    --star: #a3a4ff; --ball: #3fd6cb; --accent: #ff7f6b; --accent-ink: #1b1020; --win: #3a4a1f;
+    --paper: #f4f7ff; --sky-a: #1d3a6b; --sky-b: #14264a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14203a; --ink: #f1f6ff; --ink-soft: #a9b9d8; --tile: #22325a; --tile-edge: #2f4478;
+  --star: #a3a4ff; --ball: #3fd6cb; --accent: #ff7f6b; --accent-ink: #1b1020; --win: #3a4a1f;
+  --paper: #f4f7ff; --sky-a: #1d3a6b; --sky-b: #14264a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 18px;
+  padding-block: 10px 14px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-user-select: none; user-select: none; overflow: hidden;
+}
+button { font-family: inherit; touch-action: manipulation; }
+#app { height: 100%; max-width: 560px; margin: 0 auto; min-height: 0; }
+.screen { height: 100%; display: flex; flex-direction: column; gap: 12px; min-height: 0; min-width: 0; }
+.play-area { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; }
+
+/* barra superior */
+.topbar { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; flex: none; }
+.ptitle { text-align: center; font-weight: 700; font-size: 22px; min-width: 0; }
+.small-btn {
+  font-weight: 600; font-size: 16px; color: var(--ink); background: var(--tile);
+  border: 3px solid var(--tile-edge); border-radius: 16px; padding: 8px 14px; cursor: pointer; min-height: 46px;
+}
+
+/* central de jogos */
+.hub-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex: none; }
+h1 { font-size: clamp(30px, 8vw, 40px); line-height: 1.05; margin: 0; font-weight: 700; text-wrap: balance; }
+.hub-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: minmax(0, 1fr); gap: 12px; }
+.gcard {
+  background: var(--tile); border: 3px solid var(--tile-edge); border-bottom-width: 8px; border-radius: 28px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 8px;
+  color: var(--ink); font-weight: 600; font-size: clamp(17px, 4.6vw, 22px); cursor: pointer; min-height: 0; min-width: 0;
+  text-align: center; line-height: 1.1;
+}
+.gcard:active { transform: translateY(3px); border-bottom-width: 5px; }
+.gcard svg { width: clamp(44px, 15vw, 78px); height: auto; max-height: 55%; }
+
+/* menu de cada jogo */
+.menu-body { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+.menu-body h2 { margin: 0; text-align: center; font-size: 34px; line-height: 1.05; }
+.menu-body .desc { margin: 0; text-align: center; color: var(--ink-soft); font-weight: 500; }
+.menu-icon { display: grid; place-items: center; }
+.menu-icon svg { width: 96px; height: 96px; }
+.label { font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .08em; font-size: 14px; margin-bottom: -6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip {
+  flex: 1 1 28%; font-weight: 600; font-size: 18px; color: var(--ink); background: var(--tile);
+  border: 3px solid var(--tile-edge); border-radius: 18px; padding: 12px 6px; cursor: pointer; min-height: 52px;
+}
+.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.big {
+  font-weight: 600; font-size: 22px; color: var(--ink); background: var(--tile);
+  border: 3px solid var(--tile-edge); border-bottom-width: 7px; border-radius: 26px; padding: 16px 18px;
+  display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; text-align: center; width: 100%;
+}
+.big:active { transform: translateY(3px); border-bottom-width: 4px; }
+.big small { display: block; font-size: 15px; font-weight: 400; color: var(--ink-soft); }
+.big.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; border-bottom-color: rgba(0,0,0,.2); }
+.big.primary small { color: inherit; opacity: .85; }
+.actions { display: flex; flex-direction: column; gap: 12px; }
+
+/* partes comuns dos jogos */
+.status {
+  flex: none; min-height: 56px; display: flex; align-items: center; justify-content: center; gap: 12px;
+  font-size: 26px; font-weight: 700; text-align: center; line-height: 1.1;
+}
+.status svg { width: 42px; height: 42px; flex: none; }
+.status.small { font-size: 22px; }
+.stage { flex: 1; min-height: 0; container-type: size; display: grid; place-items: center; }
+.square { width: min(100cqw, 100cqh); height: min(100cqw, 100cqh); }
+.fillbox { width: 100cqw; height: 100cqh; }
+.bottom { flex: none; min-height: 76px; display: flex; flex-direction: column; justify-content: center; }
+.bottom[data-show="false"] .big { visibility: hidden; pointer-events: none; }
+.focusable:focus-visible, button:focus-visible { outline: 4px solid var(--accent); outline-offset: 2px; }
+
+/* jogo da velha */
+.scores { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.score {
+  background: var(--tile); border: 3px solid var(--tile-edge); border-radius: 20px; height: 56px;
+  display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; font-size: 28px;
+  font-variant-numeric: tabular-nums;
+}
+.score svg { width: 32px; height: 32px; }
+.score[data-on="true"] { border-color: var(--accent); }
+.board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; height: 100%; }
+.cell {
+  background: var(--tile); border: 3px solid var(--tile-edge); border-bottom-width: 7px; border-radius: 24px;
+  padding: 12%; cursor: pointer; min-width: 0; min-height: 0; overflow: hidden; color: inherit; position: relative;
+}
+.cell:disabled { cursor: default; }
+.cell:not(:disabled):active { transform: translateY(3px); }
+.cell svg { position: absolute; inset: 12%; width: 76%; height: 76%; display: block; }
+.cell.pop svg { animation: pop .35s cubic-bezier(.3, 1.6, .5, 1); }
+.cell.win { background: var(--win); border-color: var(--accent); }
+.cell.win svg { animation: bounce .7s ease-in-out infinite alternate; }
+@keyframes pop { from { transform: scale(.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes bounce { from { transform: scale(1) rotate(-6deg); } to { transform: scale(1.14) rotate(6deg); } }
+
+/* memória */
+.mgrid { display: grid; gap: 10px; width: 100cqw; height: 100cqh; }
+.mcard { container-type: size; position: relative; background: none; border: 0; padding: 0; min-width: 0; min-height: 0; cursor: pointer; perspective: 700px; }
+.mcard .inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .4s; }
+.mcard.open .inner { transform: rotateY(180deg); }
+.face {
+  position: absolute; inset: 0; display: grid; place-items: center; border-radius: 22px;
+  -webkit-backface-visibility: hidden; backface-visibility: hidden; font-size: 50cqmin; font-weight: 700;
+}
+.face.back { background: var(--accent); color: var(--accent-ink); border: 3px solid transparent; border-bottom: 7px solid rgba(0,0,0,.2); }
+.face.front { background: var(--tile); border: 3px solid var(--tile-edge); transform: rotateY(180deg); }
+.mcard.ok .face.front { background: var(--win); border-color: var(--accent); }
+
+/* balões */
+.sky { position: relative; width: 100cqw; height: 100cqh; overflow: hidden; border-radius: 26px; background: linear-gradient(var(--sky-a), var(--sky-b)); border: 3px solid var(--tile-edge); }
+.b-move { position: absolute; top: 0; pointer-events: none; animation: rise linear forwards; }
+.b-move button {
+  pointer-events: auto; display: block; width: 100%; height: calc(var(--w) * 1.22); border: 0; padding: 0; cursor: pointer;
+  border-radius: 50% 50% 48% 48%; position: relative; transform-origin: 50% 100%;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.6) 0 11%, transparent 12%), var(--c);
+}
+.b-move button::after { content: ""; position: absolute; left: 50%; top: 100%; width: 3px; height: 40px; background: rgba(0,0,0,.25); transform: translateX(-50%); }
+.b-move button.pop { animation: boom .22s ease-out forwards; pointer-events: none; }
+@keyframes rise { from { transform: translateY(var(--h)); } to { transform: translateY(calc(-1 * var(--bh))); } }
+@keyframes boom { to { transform: scale(1.5); opacity: 0; } }
+
+/* pintar */
+.paint { width: 100%; height: 100%; display: block; border-radius: 22px; border: 3px solid var(--tile-edge); background: var(--paper); }
+.paint .reg { fill: var(--paper); stroke: #1d2b4a; stroke-width: 1.2; stroke-linejoin: round; cursor: pointer; }
+.palette { flex: none; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.sw { height: 42px; border-radius: 14px; border: 3px solid var(--tile-edge); cursor: pointer; padding: 0; font-weight: 600; font-size: 12px; color: var(--ink); background: var(--tile); }
+.sw[aria-pressed="true"] { outline: 4px solid var(--ink); outline-offset: 1px; }
+
+/* contar */
+.items { display: grid; width: 100cqw; height: 100cqh; }
+.it { container-type: size; display: grid; place-items: center; font-size: min(62cqmin, 120px); }
+.choices { flex: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; min-height: 84px; }
+.num { font-size: 40px; font-weight: 700; color: var(--ink); background: var(--tile); border: 3px solid var(--tile-edge); border-bottom-width: 7px; border-radius: 24px; cursor: pointer; }
+.num:active { transform: translateY(3px); }
+.num.right { background: #22c55e; color: #fff; border-color: transparent; }
+.num.wrong { opacity: .35; animation: shake .3s; }
+@keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+/* sequência */
+.pads { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 12px; width: 100%; height: 100%; }
+.pad { background: var(--c); border: 0; border-radius: 28px; opacity: .55; cursor: pointer; transition: opacity .1s, transform .1s; min-width: 0; min-height: 0; }
+.pad.lit { opacity: 1 !important; transform: scale(1.04); box-shadow: 0 0 0 6px rgba(255,255,255,.65); }
+
+.confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20; }
+.confetti i { position: absolute; top: -20px; width: 12px; height: 18px; border-radius: 3px; animation: fall linear forwards; }
+@keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .cell.pop svg, .cell.win svg { animation: none; }
+  .confetti { display: none; }
+  .mcard .inner { transition: none; }
+}
+</style>
+
+</head>
+<body>
+<div id="app">
+  <section id="hub" class="screen">
+    <div class="hub-head"><h1>Cantinho dos Jogos</h1><button class="small-btn snd" type="button"></button></div>
+    <div class="hub-grid" id="hubGrid"></div>
+  </section>
+  <section id="gmenu" class="screen" hidden></section>
+  <section id="play" class="screen" hidden>
+    <div class="topbar">
+      <button class="small-btn" id="btnBack" type="button">&larr; Voltar</button>
+      <div class="ptitle" id="ptitle"></div>
+      <button class="small-btn snd" type="button"></button>
+    </div>
+    <div class="play-area" id="playArea"></div>
+  </section>
+</div>
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  function rand(n) { return Math.floor(Math.random() * n); }
+  function pick(a) { return a[rand(a.length)]; }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = rand(i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+  var sound = true, gtoken = 0, cleanups = [], current = null;
+  function later(fn, ms) { var T = gtoken; return setTimeout(function () { if (T === gtoken) fn(); }, ms); }
+
+  /* som */
+  var ctx = null;
+  function beep(freq, dur, type, delay) {
+    if (!sound) return;
+    try {
+      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+      var t = ctx.currentTime + (delay || 0), o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type || 'sine'; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.18, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + dur + 0.02);
+    } catch (e) {}
+  }
+  function sfxWin() { [523, 659, 784, 1047].forEach(function (f, i) { beep(f, 0.22, 'triangle', i * 0.12); }); }
+  function sfxBad() { beep(220, 0.25, 'sine'); }
+  function confetti() {
+    var box = $('confetti'), colors = ['#ffb800', '#12a9a0', '#ff6b57', '#7c5cff', '#4cc9f0'];
+    for (var i = 0; i < 46; i++) {
+      var e = document.createElement('i');
+      e.style.left = Math.random() * 100 + '%'; e.style.background = pick(colors);
+      e.style.animationDuration = 1.8 + Math.random() * 1.6 + 's'; e.style.animationDelay = Math.random() * 0.5 + 's';
+      box.appendChild(e);
+    }
+    later(function () { box.innerHTML = ''; }, 4200);
+  }
+  function updateSnd() {
+    document.querySelectorAll('.snd').forEach(function (b) { b.textContent = 'Som: ' + (sound ? 'ligado' : 'desligado'); b.setAttribute('aria-pressed', String(sound)); });
+  }
+  document.querySelectorAll('.snd').forEach(function (b) { b.addEventListener('click', function () { sound = !sound; updateSnd(); }); });
+
+  /* figuras */
+  var X = '<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M22 22 L78 78 M78 22 L22 78" fill="none" stroke="var(--star)" stroke-width="16" stroke-linecap="round"/></svg>';
+  var O = '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="33" fill="none" stroke="var(--ball)" stroke-width="16"/></svg>';
+  var STAR = '<svg viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,8 61,37 92,38 67,57 76,88 50,70 24,88 33,57 8,38 39,37" fill="#ffb800" stroke="#ffb800" stroke-width="8" stroke-linejoin="round"/></svg>';
+
+  /* ---------- JOGO DA VELHA ---------- */
+  var ICON = { X: X, O: O };
+  var DE = { X: 'do X', O: 'da bola' };
+  var NAME = { X: 'X', O: 'bola' };
+  var LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  function winnerOf(b) {
+    for (var i = 0; i < LINES.length; i++) { var l = LINES[i]; if (b[l[0]] && b[l[0]] === b[l[1]] && b[l[0]] === b[l[2]]) return { p: b[l[0]], line: l }; }
+    return null;
+  }
+  function empties(b) { var r = []; for (var i = 0; i < 9; i++) if (!b[i]) r.push(i); return r; }
+  function minimax(b, player) {
+    var w = winnerOf(b); if (w) return w.p === 'O' ? 10 : -10;
+    var e = empties(b); if (!e.length) return 0;
+    var best = player === 'O' ? -Infinity : Infinity;
+    for (var k = 0; k < e.length; k++) {
+      b[e[k]] = player; var s = minimax(b, player === 'O' ? 'X' : 'O'); b[e[k]] = null;
+      best = player === 'O' ? Math.max(best, s) : Math.min(best, s);
+    }
+    return best;
+  }
+  function findWinning(b, p) {
+    var e = empties(b);
+    for (var i = 0; i < e.length; i++) { b[e[i]] = p; var w = winnerOf(b); b[e[i]] = null; if (w) return e[i]; }
+    return -1;
+  }
+  function cpuChoice(board, level) {
+    var b = board.slice(), e = empties(b);
+    if (level === 'easy') return pick(e);
+    if (level === 'mid') {
+      var m = findWinning(b, 'O'); if (m < 0) m = findWinning(b, 'X');
+      if (m >= 0 && Math.random() < 0.85) return m;
+      return pick(e);
+    }
+    var bestScore = -Infinity, moves = [];
+    for (var i = 0; i < e.length; i++) {
+      b[e[i]] = 'O'; var s = minimax(b, 'X'); b[e[i]] = null;
+      if (s > bestScore) { bestScore = s; moves = [e[i]]; } else if (s === bestScore) moves.push(e[i]);
+    }
+    return pick(moves);
+  }
+
+  function velha(area, level, mode) {
+    area.innerHTML =
+      '<div class="scores"><div class="score" data-p="X"><span class="ic">' + X + '</span><span class="n">0</span></div>' +
+      '<div class="score" data-p="O"><span class="ic">' + O + '</span><span class="n">0</span></div></div>' +
+      '<div class="status"></div>' +
+      '<div class="stage"><div class="square"><div class="board"></div></div></div>' +
+      '<div class="bottom" data-show="false"><button class="big primary" type="button">Jogar de novo</button></div>';
+    var boardEl = area.querySelector('.board'), statusEl = area.querySelector('.status'), bottom = area.querySelector('.bottom');
+    var scoreEls = { X: area.querySelector('[data-p="X"]'), O: area.querySelector('[data-p="O"]') };
+    var st = { board: [], turn: 'X', starter: 'X', over: false, last: -1, line: [], scores: { X: 0, O: 0 } };
+    var cells = [];
+    for (var i = 0; i < 9; i++) {
+      var c = document.createElement('button'); c.type = 'button'; c.className = 'cell';
+      c.addEventListener('click', (function (idx) { return function () { onCell(idx); }; })(i));
+      boardEl.appendChild(c); cells.push(c);
+    }
+    function render() {
+      for (var i = 0; i < 9; i++) {
+        var v = st.board[i], c = cells[i];
+        if ((c.dataset.v || '') !== (v || '')) { c.innerHTML = v ? ICON[v] : ''; c.dataset.v = v || ''; }
+        c.className = 'cell' + (i === st.last && v ? ' pop' : '') + (st.line.indexOf(i) >= 0 ? ' win' : '');
+        c.disabled = !!v || st.over || (mode === 'cpu' && st.turn === 'O');
+        c.setAttribute('aria-label', 'Casa ' + (i + 1) + (v ? ', ' + NAME[v] : ', vazia'));
+      }
+      ['X', 'O'].forEach(function (p) {
+        scoreEls[p].querySelector('.n').textContent = st.scores[p];
+        scoreEls[p].dataset.on = String(!st.over && st.turn === p);
+      });
+    }
+    function turnStatus() {
+      statusEl.innerHTML = mode === 'cpu' ? (st.turn === 'X' ? 'Sua vez ' + X : 'Pensando… ' + O) : 'Vez ' + DE[st.turn] + ' ' + ICON[st.turn];
+    }
+    function newRound() {
+      st.board = [null,null,null,null,null,null,null,null,null]; st.turn = st.starter; st.over = false; st.last = -1; st.line = [];
+      bottom.dataset.show = 'false'; cells.forEach(function (c) { c.dataset.v = ''; c.innerHTML = ''; });
+      render(); turnStatus();
+      if (mode === 'cpu' && st.turn === 'O') cpuLater();
+    }
+    function cpuLater() { later(function () { if (!st.over) place(cpuChoice(st.board, level)); }, 650); }
+    function onCell(i) { if (st.over || st.board[i]) return; if (mode === 'cpu' && st.turn !== 'X') return; place(i); }
+    function place(i) {
+      if (i == null || i < 0 || st.board[i] || st.over) return;
+      var p = st.turn; st.board[i] = p; st.last = i; beep(p === 'X' ? 660 : 440, 0.15, 'triangle');
+      var w = winnerOf(st.board);
+      if (w) {
+        st.over = true; st.line = w.line; st.scores[w.p]++; render();
+        statusEl.innerHTML = mode === 'cpu' ? (w.p === 'X' ? 'Você ganhou! ' + X : 'O computador ganhou ' + O) : (w.p === 'X' ? 'O X' : 'A bola') + ' ganhou! ' + ICON[w.p];
+        sfxWin(); if (mode === 'pvp' || w.p === 'X') confetti();
+        end(); return;
+      }
+      if (!empties(st.board).length) { st.over = true; render(); statusEl.textContent = 'Empate! Bom jogo!'; beep(330, 0.2); beep(294, 0.3, 'sine', 0.18); end(); return; }
+      st.turn = p === 'X' ? 'O' : 'X'; render(); turnStatus();
+      if (mode === 'cpu' && st.turn === 'O') cpuLater();
+    }
+    function end() { st.starter = st.starter === 'X' ? 'O' : 'X'; bottom.dataset.show = 'true'; }
+    bottom.querySelector('button').addEventListener('click', newRound);
+    newRound();
+  }
+
+  /* ---------- MEMÓRIA ---------- */
+  function memoria(area, pairs, mode, api) {
+    var EM = ['🐶', '🐱', '🐸', '🐵', '🐰', '🦁', '🐷', '🐻', '🐼', '🐮', '🐯', '🦊'];
+    var deck = shuffle(shuffle(EM).slice(0, pairs).reduce(function (a, e) { return a.concat([e, e]); }, []));
+    var cols = pairs === 6 ? 3 : 2, rows = deck.length / cols;
+    area.innerHTML = '<div class="status small"></div><div class="stage"><div class="mgrid"></div></div>' +
+      '<div class="bottom" data-show="false"><button class="big primary" type="button">Jogar de novo</button></div>';
+    var statusEl = area.querySelector('.status'), grid = area.querySelector('.mgrid'), bottom = area.querySelector('.bottom');
+    grid.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(0, 1fr))';
+    grid.style.gridTemplateRows = 'repeat(' + rows + ', minmax(0, 1fr))';
+    var open = [], lock = false, moves = 0, found = 0, els = [];
+    function info() { statusEl.innerHTML = 'Jogadas: ' + moves + ' &nbsp;·&nbsp; Pares: ' + found + '/' + pairs; }
+    deck.forEach(function (e, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'mcard';
+      b.setAttribute('aria-label', 'Carta ' + (i + 1));
+      b.innerHTML = '<div class="inner"><div class="face back">?</div><div class="face front">' + e + '</div></div>';
+      b.addEventListener('click', function () { flip(i); });
+      grid.appendChild(b); els.push(b);
+    });
+    function flip(i) {
+      if (lock || els[i].classList.contains('open')) return;
+      els[i].classList.add('open'); beep(520, 0.1, 'triangle'); open.push(i);
+      if (open.length < 2) return;
+      moves++; lock = true; var a = open[0], b = open[1]; open = [];
+      if (deck[a] === deck[b]) {
+        later(function () {
+          els[a].classList.add('ok'); els[b].classList.add('ok'); found++; lock = false; info(); beep(784, 0.18, 'triangle');
+          if (found === pairs) { statusEl.textContent = 'Parabéns! Achou todos!'; sfxWin(); confetti(); bottom.dataset.show = 'true'; }
+        }, 450);
+      } else {
+        info();
+        later(function () { els[a].classList.remove('open'); els[b].classList.remove('open'); lock = false; }, 1000);
+      }
+    }
+    bottom.querySelector('button').addEventListener('click', api.restart);
+    info();
+  }
+
+  /* ---------- BALÕES ---------- */
+  function baloes(area, speed) {
+    area.innerHTML = '<div class="status small">Balões estourados: <span class="n">0</span></div><div class="stage"><div class="sky"></div></div>';
+    var sky = area.querySelector('.sky'), nEl = area.querySelector('.n'), count = 0;
+    var COLORS = ['#ff6b57', '#ffb800', '#12a9a0', '#7c5cff', '#ff5fa2', '#3b82f6'];
+    function spawn(delaySec) {
+      if (sky.children.length > 9) return;
+      var W = sky.clientWidth, H = sky.clientHeight; if (!W || !H) return;
+      var w = Math.round(W * (0.2 + Math.random() * 0.08)), dur = (speed === 'calm' ? 10 : 7) + Math.random() * 3;
+      var o = document.createElement('div'); o.className = 'b-move';
+      o.style.left = Math.round(Math.random() * (W - w)) + 'px'; o.style.width = w + 'px';
+      o.style.setProperty('--w', w + 'px'); o.style.setProperty('--h', H + 'px'); o.style.setProperty('--bh', Math.round(w * 1.22 + 60) + 'px');
+      o.style.animationDuration = dur + 's'; if (delaySec) o.style.animationDelay = '-' + delaySec + 's';
+      var b = document.createElement('button'); b.type = 'button'; b.style.setProperty('--c', pick(COLORS)); b.setAttribute('aria-label', 'Balão');
+      b.addEventListener('pointerdown', function (e) {
+        e.preventDefault(); if (b.classList.contains('pop')) return;
+        b.classList.add('pop'); count++; nEl.textContent = count; beep(480 + Math.random() * 500, 0.08, 'square');
+        if (count % 10 === 0) { sfxWin(); confetti(); }
+        later(function () { o.remove(); }, 260);
+      });
+      o.appendChild(b); o.addEventListener('animationend', function (e) { if (e.target === o) o.remove(); });
+      sky.appendChild(o);
+    }
+    later(function () { for (var i = 0; i < 4; i++) spawn(2 + i * 1.6); }, 50);
+    var iv = setInterval(function () { spawn(0); }, speed === 'calm' ? 1100 : 750);
+    return { stop: function () { clearInterval(iv); } };
+  }
+
+  /* ---------- PINTAR ---------- */
+  var DRAWINGS = {
+    casa: function () {
+      return '<rect class="reg" x="0" y="0" width="100" height="100"/><rect class="reg" x="0" y="82" width="100" height="18"/>' +
+        '<circle class="reg" cx="84" cy="16" r="9"/><rect class="reg" x="66" y="22" width="9" height="18"/>' +
+        '<rect class="reg" x="22" y="46" width="56" height="38"/><polygon class="reg" points="14,48 50,16 86,48"/>' +
+        '<rect class="reg" x="44" y="62" width="14" height="22"/><rect class="reg" x="28" y="54" width="12" height="12"/><rect class="reg" x="60" y="54" width="12" height="12"/>';
+    },
+    flor: function () {
+      var s = '<rect class="reg" x="0" y="0" width="100" height="100"/><rect class="reg" x="0" y="84" width="100" height="16"/><circle class="reg" cx="14" cy="14" r="8"/>' +
+        '<rect class="reg" x="48" y="48" width="4" height="38"/><ellipse class="reg" cx="36" cy="70" rx="10" ry="4.5"/><ellipse class="reg" cx="64" cy="62" rx="10" ry="4.5"/>' +
+        '<polygon class="reg" points="38,80 62,80 58,96 42,96"/>';
+      for (var k = 0; k < 6; k++) { var a = k * Math.PI / 3; s += '<circle class="reg" cx="' + (50 + 15 * Math.cos(a)).toFixed(1) + '" cy="' + (36 + 15 * Math.sin(a)).toFixed(1) + '" r="10"/>'; }
+      return s + '<circle class="reg" cx="50" cy="36" r="8"/>';
+    },
+    peixe: function () {
+      return '<rect class="reg" x="0" y="0" width="100" height="100"/><rect class="reg" x="0" y="88" width="100" height="12"/>' +
+        '<polygon class="reg" points="36,34 50,18 60,36"/><polygon class="reg" points="66,50 90,32 90,68"/><ellipse class="reg" cx="44" cy="50" rx="26" ry="18"/>' +
+        '<circle class="reg" cx="30" cy="46" r="3.5"/><circle class="reg" cx="16" cy="26" r="5"/><circle class="reg" cx="24" cy="14" r="3.5"/><circle class="reg" cx="10" cy="12" r="3"/>';
+    },
+    carro: function () {
+      return '<rect class="reg" x="0" y="0" width="100" height="100"/><rect class="reg" x="0" y="78" width="100" height="22"/><circle class="reg" cx="84" cy="16" r="9"/>' +
+        '<polygon class="reg" points="30,54 38,36 64,36 74,54"/><rect class="reg" x="12" y="52" width="76" height="20" rx="5"/>' +
+        '<polygon class="reg" points="36,50 41,39 50,39 50,50"/><polygon class="reg" points="54,50 54,39 62,39 69,50"/>' +
+        '<circle class="reg" cx="30" cy="74" r="9"/><circle class="reg" cx="70" cy="74" r="9"/><circle class="reg" cx="30" cy="74" r="3.5"/><circle class="reg" cx="70" cy="74" r="3.5"/>';
+    },
+    foguete: function () {
+      return '<rect class="reg" x="0" y="0" width="100" height="100"/><circle class="reg" cx="14" cy="18" r="3"/><circle class="reg" cx="86" cy="32" r="3"/><circle class="reg" cx="82" cy="78" r="3"/><circle class="reg" cx="18" cy="70" r="3"/><circle class="reg" cx="80" cy="12" r="7"/>' +
+        '<polygon class="reg" points="42,68 58,68 50,94"/><polygon class="reg" points="38,50 22,74 38,68"/><polygon class="reg" points="62,50 78,74 62,68"/>' +
+        '<path class="reg" d="M50 8C65 24 67 46 62 68L38 68C33 46 35 24 50 8Z"/><circle class="reg" cx="50" cy="38" r="7"/>';
+    },
+    borboleta: function () {
+      return '<rect class="reg" x="0" y="0" width="100" height="100"/><rect class="reg" x="0" y="86" width="100" height="14"/>' +
+        '<ellipse class="reg" cx="33" cy="36" rx="16" ry="21" transform="rotate(-25 33 36)"/><ellipse class="reg" cx="37" cy="62" rx="12" ry="15" transform="rotate(25 37 62)"/>' +
+        '<ellipse class="reg" cx="67" cy="36" rx="16" ry="21" transform="rotate(25 67 36)"/><ellipse class="reg" cx="63" cy="62" rx="12" ry="15" transform="rotate(-25 63 62)"/>' +
+        '<circle class="reg" cx="31" cy="34" r="5"/><circle class="reg" cx="69" cy="34" r="5"/><ellipse class="reg" cx="50" cy="52" rx="4.5" ry="22"/>';
+    },
+    arvore: function () {
+      return '<rect class="reg" x="0" y="0" width="100" height="100"/><rect class="reg" x="0" y="84" width="100" height="16"/><circle class="reg" cx="84" cy="14" r="8"/><ellipse class="reg" cx="22" cy="16" rx="13" ry="6"/>' +
+        '<rect class="reg" x="44" y="56" width="12" height="30"/><circle class="reg" cx="34" cy="48" r="14"/><circle class="reg" cx="66" cy="48" r="14"/><circle class="reg" cx="50" cy="36" r="20"/>' +
+        '<circle class="reg" cx="44" cy="34" r="3.5"/><circle class="reg" cx="58" cy="44" r="3.5"/><circle class="reg" cx="36" cy="50" r="3.5"/>';
+    },
+    sorvete: function () {
+      return '<rect class="reg" x="0" y="0" width="100" height="100"/><polygon class="reg" points="33,52 67,52 50,94"/><circle class="reg" cx="50" cy="40" r="18"/><circle class="reg" cx="50" cy="24" r="13"/><circle class="reg" cx="50" cy="9" r="4.5"/>';
+    }
+  };
+  var PAINT = ['#ef4444', '#f97316', '#facc15', '#84cc16', '#16a34a', '#14b8a6', '#38bdf8', '#2563eb', '#a855f7', '#ec4899', '#92400e', '#1f2937'];
+  function pintar(area, which) {
+    area.innerHTML = '<div class="stage"><div class="square"><svg class="paint" viewBox="0 0 100 100" role="img" aria-label="Desenho para pintar">' + DRAWINGS[which]() + '</svg></div></div><div class="palette"></div>';
+    var svg = area.querySelector('svg'), pal = area.querySelector('.palette'), color = PAINT[0], sws = [];
+    function select(b, c) { color = c; sws.forEach(function (s) { s.setAttribute('aria-pressed', String(s === b)); }); }
+    PAINT.concat(['erase']).forEach(function (c, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.setAttribute('aria-label', c === 'erase' ? 'Borracha' : 'Cor ' + (i + 1));
+      b.style.background = c === 'erase' ? 'var(--paper)' : c; if (c === 'erase') b.textContent = 'Apagar';
+      b.setAttribute('aria-pressed', String(i === 0)); b.addEventListener('click', function () { select(b, c === 'erase' ? '' : c); });
+      pal.appendChild(b); sws.push(b);
+    });
+    var clr = document.createElement('button'); clr.type = 'button'; clr.className = 'sw'; clr.textContent = 'Limpar';
+    clr.addEventListener('click', function () { svg.querySelectorAll('.reg').forEach(function (r) { r.style.fill = ''; }); });
+    pal.appendChild(clr);
+    svg.addEventListener('click', function (e) {
+      var r = e.target.closest ? e.target.closest('.reg') : null; if (!r) return;
+      r.style.fill = color; beep(400 + rand(300), 0.08, 'triangle');
+    });
+  }
+
+  /* ---------- CONTAR ---------- */
+  function contar(area, max) {
+    area.innerHTML = '<div class="status small"><span class="s">' + STAR + '</span> <span class="n">0</span></div><div class="stage"><div class="items"></div></div><div class="choices"></div>';
+    var itemsEl = area.querySelector('.items'), choicesEl = area.querySelector('.choices'), nEl = area.querySelector('.n'), stars = 0, locked = false;
+    var ICONS = ['🍎', '🐟', '⭐', '🚗', '🎈', '🍌', '🐥', '🌸'];
+    function next() {
+      var n = 1 + rand(max), icon = pick(ICONS), cols = n <= 3 ? n : (n === 4 ? 2 : 3), rows = Math.ceil(n / cols);
+      itemsEl.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(0, 1fr))'; itemsEl.style.gridTemplateRows = 'repeat(' + rows + ', minmax(0, 1fr))';
+      itemsEl.innerHTML = ''; for (var i = 0; i < n; i++) { var d = document.createElement('div'); d.className = 'it'; d.textContent = icon; itemsEl.appendChild(d); }
+      var set = [n]; while (set.length < 3) { var v = 1 + rand(max); if (set.indexOf(v) < 0) set.push(v); }
+      choicesEl.innerHTML = ''; locked = false;
+      shuffle(set).forEach(function (v) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'num'; b.textContent = v;
+        b.addEventListener('click', function () {
+          if (locked || b.disabled) return;
+          if (v === n) {
+            locked = true; b.classList.add('right'); stars++; nEl.textContent = stars; sfxWin();
+            if (stars % 5 === 0) confetti(); later(next, 1100);
+          } else { b.classList.add('wrong'); b.disabled = true; sfxBad(); }
+        });
+        choicesEl.appendChild(b);
+      });
+    }
+    next();
+  }
+
+  /* ---------- SEQUÊNCIA ---------- */
+  function sequencia(area, max, mode, api) {
+    area.innerHTML = '<div class="status small"></div><div class="stage"><div class="square"><div class="pads"></div></div></div>' +
+      '<div class="bottom" data-show="false"><button class="big primary" type="button">Jogar de novo</button></div>';
+    var statusEl = area.querySelector('.status'), padsEl = area.querySelector('.pads'), bottom = area.querySelector('.bottom');
+    var COLORS = ['#ef4444', '#3b82f6', '#facc15', '#22c55e'], TONES = [262, 330, 392, 523], NAMES = ['vermelho', 'azul', 'amarelo', 'verde'];
+    var pads = [], seq = [], pos = 0, input = false;
+    COLORS.forEach(function (c, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'pad'; b.style.setProperty('--c', c); b.disabled = true; b.setAttribute('aria-label', NAMES[i]);
+      b.addEventListener('click', function () { press(i); }); padsEl.appendChild(b); pads.push(b);
+    });
+    function light(p) { pads[p].classList.add('lit'); beep(TONES[p], 0.35, 'triangle'); later(function () { pads[p].classList.remove('lit'); }, 450); }
+    function setInput(on) { input = on; pads.forEach(function (b) { b.disabled = !on; }); }
+    function show() {
+      setInput(false); statusEl.textContent = 'Olhe com atenção (' + seq.length + '/' + max + ')';
+      seq.forEach(function (p, i) { later(function () { light(p); }, 700 + i * 750); });
+      later(function () { pos = 0; setInput(true); statusEl.textContent = 'Sua vez!'; }, 700 + seq.length * 750);
+    }
+    function press(p) {
+      if (!input) return; light(p);
+      if (p === seq[pos]) {
+        pos++;
+        if (pos === seq.length) {
+          setInput(false);
+          if (seq.length === max) { statusEl.textContent = 'Você conseguiu!'; later(function () { sfxWin(); confetti(); bottom.dataset.show = 'true'; }, 500); }
+          else { statusEl.textContent = 'Muito bem!'; later(function () { seq.push(rand(4)); show(); }, 1000); }
+        }
+      } else { setInput(false); statusEl.textContent = 'Quase! Vamos de novo'; later(sfxBad, 300); later(show, 1300); }
+    }
+    bottom.querySelector('button').addEventListener('click', api.restart);
+    seq.push(rand(4)); show();
+  }
+
+  /* ---------- catálogo, menus e navegação ---------- */
+  var GAMES = [
+    { id: 'velha', title: 'Jogo da Velha', desc: 'Ligue três em linha', run: velha, optLabel: 'Nível do computador',
+      options: [{ label: 'Fácil', value: 'easy' }, { label: 'Médio', value: 'mid' }, { label: 'Difícil', value: 'hard' }],
+      actions: [{ label: 'Jogar com o computador', small: 'Você é o X', mode: 'cpu', primary: true }, { label: 'Jogar com outra pessoa', small: 'X e bola, um de cada vez', mode: 'pvp' }],
+      icon: '<svg viewBox="0 0 64 64"><path d="M22 8v48M42 8v48M8 22h48M8 42h48" stroke="var(--ink-soft)" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M11 11l8 8M19 11l-8 8" stroke="var(--star)" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="32" r="5" fill="none" stroke="var(--ball)" stroke-width="4"/><path d="M45 45l8 8M53 45l-8 8" stroke="var(--star)" stroke-width="4" stroke-linecap="round"/></svg>' },
+    { id: 'memoria', title: 'Memória', desc: 'Ache os pares de bichinhos', run: memoria, optLabel: 'Quantos pares',
+      options: [{ label: '3 pares', value: 3 }, { label: '4 pares', value: 4 }, { label: '6 pares', value: 6 }],
+      actions: [{ label: 'Jogar', mode: 'play', primary: true }],
+      icon: '<svg viewBox="0 0 64 64"><rect x="6" y="12" width="24" height="36" rx="6" fill="var(--accent)"/><rect x="34" y="16" width="24" height="36" rx="6" fill="var(--tile)" stroke="var(--ball)" stroke-width="4"/><text x="18" y="39" text-anchor="middle" font-size="22" font-weight="700" fill="#fff" font-family="inherit">?</text><circle cx="46" cy="34" r="7" fill="#ffb800"/></svg>' },
+    { id: 'baloes', title: 'Balões', desc: 'Toque nos balões para estourar', run: baloes, optLabel: 'Velocidade',
+      options: [{ label: 'Calmo', value: 'calm' }, { label: 'Normal', value: 'normal' }],
+      actions: [{ label: 'Jogar', mode: 'play', primary: true }],
+      icon: '<svg viewBox="0 0 64 64"><ellipse cx="24" cy="24" rx="14" ry="17" fill="var(--accent)"/><ellipse cx="42" cy="28" rx="12" ry="15" fill="var(--ball)"/><path d="M24 41L28 60M42 43L38 60" stroke="var(--ink-soft)" stroke-width="2" fill="none"/></svg>' },
+    { id: 'pintar', title: 'Pintar', desc: 'Toque no desenho para colorir', run: pintar, optLabel: 'Desenho',
+      options: [{ label: 'Casa', value: 'casa' }, { label: 'Flor', value: 'flor' }, { label: 'Peixe', value: 'peixe' }, { label: 'Carro', value: 'carro' }, { label: 'Foguete', value: 'foguete' }, { label: 'Borboleta', value: 'borboleta' }, { label: 'Árvore', value: 'arvore' }, { label: 'Sorvete', value: 'sorvete' }],
+      actions: [{ label: 'Pintar', mode: 'play', primary: true }],
+      icon: '<svg viewBox="0 0 64 64"><path d="M32 6C16 6 6 18 6 30c0 12 10 22 22 22 6 0 6-5 3-8-3-4 0-8 5-8h8c8 0 14-5 14-12C58 14 46 6 32 6z" fill="var(--tile)" stroke="var(--ink-soft)" stroke-width="3"/><circle cx="20" cy="26" r="5" fill="#ef4444"/><circle cx="32" cy="18" r="5" fill="#facc15"/><circle cx="45" cy="24" r="5" fill="#22c55e"/><circle cx="18" cy="40" r="5" fill="#3b82f6"/></svg>' },
+    { id: 'contar', title: 'Contar', desc: 'Conte e toque no número certo', run: contar, optLabel: 'Até quanto',
+      options: [{ label: 'Até 3', value: 3 }, { label: 'Até 5', value: 5 }, { label: 'Até 9', value: 9 }],
+      actions: [{ label: 'Jogar', mode: 'play', primary: true }],
+      icon: '<svg viewBox="0 0 64 64"><text x="32" y="44" text-anchor="middle" font-size="32" font-weight="700" fill="var(--accent)" font-family="inherit">123</text></svg>' },
+    { id: 'sequencia', title: 'Siga as Cores', desc: 'Repita a sequência de cores', run: sequencia, optLabel: 'Tamanho',
+      options: [{ label: 'Curto', value: 3 }, { label: 'Médio', value: 5 }, { label: 'Longo', value: 8 }],
+      actions: [{ label: 'Jogar', mode: 'play', primary: true }],
+      icon: '<svg viewBox="0 0 64 64"><rect x="6" y="6" width="25" height="25" rx="7" fill="#ef4444"/><rect x="33" y="6" width="25" height="25" rx="7" fill="#3b82f6"/><rect x="6" y="33" width="25" height="25" rx="7" fill="#facc15"/><rect x="33" y="33" width="25" height="25" rx="7" fill="#22c55e"/></svg>' }
+  ];
+  GAMES.forEach(function (g) { g.sel = 0; });
+
+  var SCREENS = ['hub', 'gmenu', 'play'];
+  function show(id) { SCREENS.forEach(function (s) { $(s).hidden = s !== id; }); }
+  function stopGame() {
+    gtoken++; cleanups.forEach(function (f) { try { f(); } catch (e) {} }); cleanups = [];
+    $('confetti').innerHTML = ''; $('playArea').innerHTML = '';
+  }
+  function showHub() { stopGame(); current = null; show('hub'); }
+  function showMenu(g) {
+    stopGame(); current = g; show('gmenu');
+    var m = $('gmenu');
+    m.innerHTML = '<div class="topbar"><button class="small-btn" data-a="home" type="button">&larr; Jogos</button><div></div><button class="small-btn snd" type="button"></button></div>' +
+      '<div class="menu-body"><div class="menu-icon">' + g.icon + '</div><h2>' + g.title + '</h2><p class="desc">' + g.desc + '</p>' +
+      '<div class="label">' + g.optLabel + '</div><div class="chips"></div><div class="actions"></div></div>';
+    var chips = m.querySelector('.chips'), acts = m.querySelector('.actions');
+    g.options.forEach(function (o, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = o.label; b.setAttribute('aria-pressed', String(i === g.sel));
+      b.addEventListener('click', function () { g.sel = i; chips.querySelectorAll('.chip').forEach(function (c, j) { c.setAttribute('aria-pressed', String(j === i)); }); });
+      chips.appendChild(b);
+    });
+    g.actions.forEach(function (a) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'big' + (a.primary ? ' primary' : '');
+      b.innerHTML = '<span>' + a.label + (a.small ? '<small>' + a.small + '</small>' : '') + '</span>';
+      b.addEventListener('click', function () { startGame(g, a.mode); }); acts.appendChild(b);
+    });
+    m.querySelector('[data-a="home"]').addEventListener('click', showHub);
+    m.querySelector('.snd').addEventListener('click', function () { sound = !sound; updateSnd(); });
+    updateSnd();
+  }
+  function startGame(g, mode) {
+    stopGame(); current = g; show('play'); $('ptitle').textContent = g.title;
+    var api = { restart: function () { startGame(g, mode); } };
+    var r = g.run($('playArea'), g.options[g.sel].value, mode, api);
+    if (r && r.stop) cleanups.push(r.stop);
+  }
+  $('btnBack').addEventListener('click', function () { if (current) showMenu(current); else showHub(); });
+
+  var grid = $('hubGrid');
+  GAMES.forEach(function (g) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'gcard';
+    b.innerHTML = g.icon + '<span>' + g.title + '</span>';
+    b.addEventListener('click', function () { showMenu(g); }); grid.appendChild(b);
+  });
+  updateSnd(); show('hub');
+})();
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
+</body>
+</html>
