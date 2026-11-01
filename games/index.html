@@ -804,6 +804,10 @@ canvas.brush { touch-action: none; }
       return BG + R(0, 90, 100, 10) + C(50, 50, 42) + P('50,34 64,44 59,60 41,60 36,44') + P('50,34 50,10 62,14 64,44') + P('50,34 50,10 38,14 36,44') + P('36,44 12,40 12,58 41,60') + P('64,44 88,40 88,58 59,60'); } },
     { id: 'guardachuva', nome: 'Guarda-chuva', tags: 'guarda-chuva guardachuva chuva sombrinha', fn: function () {
       return BG + D('M6 52 Q10 12 50 10 Q90 12 94 52 Q84 44 72 52 Q61 44 50 52 Q39 44 28 52 Q16 44 6 52 Z') + R(48, 50, 4, 34) + D('M52 84 Q52 94 42 94 Q36 94 36 88 L40 88 Q40 90 42 90 Q48 90 48 84 Z'); } },
+    { id: 'heroi', nome: 'Super-herói', tags: 'heroi superheroi super-heroi super capa mascara poderes forte', fn: function () {
+      return BG + D('M36 34 L16 92 L84 92 L64 34 Z') + R(36, 46, 28, 30, 5) + R(38, 76, 10, 18, 3) + R(52, 76, 10, 18, 3) + R(14, 48, 14, 8, 4) + R(72, 48, 14, 8, 4) + C(50, 24, 13) + R(38, 19, 24, 7, 3) + P('44,52 56,52 50,66') + L('M44 14 Q50 10 56 14'); } },
+    { id: 'aranha', nome: 'Aranha', tags: 'aranha aranhas teia inseto', fn: function () {
+      return BG + L('M50 0 L50 36') + L('M42 48 L18 30 L6 44 M42 54 L14 54 L4 68 M44 62 L20 80 L10 94 M58 48 L82 30 L94 44 M58 54 L86 54 L96 68 M56 62 L80 80 L90 94') + E(50, 66, 18, 22) + C(50, 44, 12) + C(45, 42, 3) + C(55, 42, 3); } },
     { id: 'livre', nome: 'Em branco', tags: 'branco livre vazio folha desenho-livre', fn: function () { return BG; } }
   ];
   var DRAWMAP = {}; DRAW.forEach(function (d) { DRAWMAP[d.id] = d; });
