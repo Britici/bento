@@ -766,12 +766,69 @@ canvas.brush { touch-action: none; }
     { id: 'sapo', nome: 'Sapo', tags: 'sapo ra perereca', fn: function () {
       return BG + E(50, 92, 42, 6) + E(18, 80, 12, 8) + E(82, 80, 12, 8) + E(50, 66, 30, 22) + E(50, 52, 34, 22) + C(32, 36, 11) + C(68, 36, 11) + C(32, 37, 4.5) + C(68, 37, 4.5) +
         C(44, 48, 1.6) + C(56, 48, 1.6) + L('M24 56 Q50 78 76 56'); } },
+    { id: 'leao', nome: 'Leão', tags: 'leao leaozinho juba selva rei-da-selva', fn: function () {
+      return BG + C(50, 50, 40) + C(22, 24, 8) + C(78, 24, 8) + C(50, 54, 27) + C(41, 48, 3.5) + C(59, 48, 3.5) + E(50, 68, 13, 9) + P('44,54 56,54 50,61') + L('M50 61 L50 66 M50 66 Q44 72 38 68 M50 66 Q56 72 62 68'); } },
+    { id: 'cavalo', nome: 'Cavalo', tags: 'cavalo cavalinho egua pangare pony potro', fn: function () {
+      return BG + P('34,6 40,24 46,12') + P('66,6 60,24 54,12') + E(50, 50, 20, 32) + D('M42 8 Q50 2 58 8 L56 30 Q50 24 44 30 Z') + E(50, 78, 17, 13) + C(41, 46, 3.5) + C(59, 46, 3.5) + C(44, 78, 2.5) + C(56, 78, 2.5); } },
+    { id: 'vaca', nome: 'Vaca', tags: 'vaca vaquinha boi touro leite fazenda', fn: function () {
+      return BG + P('26,26 20,8 34,20') + P('74,26 80,8 66,20') + E(14, 38, 11, 7, 20) + E(86, 38, 11, 7, -20) + E(50, 50, 28, 32) + E(32, 32, 7, 6) + E(50, 74, 18, 13) + C(41, 46, 3.5) + C(59, 46, 3.5) + C(44, 74, 2.5) + C(56, 74, 2.5); } },
+    { id: 'porco', nome: 'Porquinho', tags: 'porco porquinho porca leitao fazenda', fn: function () {
+      return BG + P('24,32 20,10 42,22') + P('76,32 80,10 58,22') + C(50, 52, 33) + E(50, 62, 15, 11) + C(43, 62, 2.8) + C(57, 62, 2.8) + C(38, 44, 3.5) + C(62, 44, 3.5); } },
+    { id: 'pato', nome: 'Pato', tags: 'pato patinho marreco lago', fn: function () {
+      return BG + R(0, 84, 100, 16) + P('4,44 22,52 10,58') + E(46, 66, 32, 20) + C(72, 32, 15) + P('84,30 98,35 84,40') + C(76, 28, 2.8) + E(44, 68, 15, 9, -12); } },
+    { id: 'macaco', nome: 'Macaco', tags: 'macaco macaquinho chimpanze primata banana', fn: function () {
+      return BG + C(16, 50, 11) + C(84, 50, 11) + C(50, 50, 32) + E(50, 58, 21, 22) + C(42, 46, 3.5) + C(58, 46, 3.5) + E(50, 66, 11, 7) + C(46, 56, 1.6) + C(54, 56, 1.6) + L('M42 70 Q50 76 58 70'); } },
+    { id: 'girafa', nome: 'Girafa', tags: 'girafa girafinha pescoco savana', fn: function () {
+      return BG + R(0, 90, 100, 10) + R(38, 34, 22, 56) + E(50, 20, 21, 14) + R(41, 4, 4, 9) + R(55, 4, 4, 9) + C(43, 3, 3) + C(57, 3, 3) + C(43, 18, 3) + C(58, 18, 3) + E(60, 24, 9, 6) + C(48, 52, 5) + C(52, 70, 5) + C(46, 80, 4); } },
+    { id: 'abelha', nome: 'Abelha', tags: 'abelha abelhinha inseto mel zangao', fn: function () {
+      return BG + E(36, 28, 14, 20, -30) + E(60, 24, 14, 20, 30) + E(50, 60, 32, 22) + E(40, 60, 5, 20) + E(54, 60, 5, 20) + C(82, 56, 12) + C(85, 52, 2.5) + P('18,60 4,64 18,66'); } },
+    { id: 'tubarao', nome: 'Tubarão', tags: 'tubarao tubaraozinho mar oceano peixe', fn: function () {
+      return BG + R(0, 80, 100, 20) + P('44,42 56,10 62,42') + P('14,56 2,38 4,72') + E(50, 58, 40, 17) + C(76, 52, 2.8) + L('M64 62 Q74 68 84 62') + P('50,72 60,74 48,86'); } },
+    { id: 'onibus', nome: 'Ônibus', tags: 'onibus busao escolar transporte', fn: function () {
+      return BG + R(0, 80, 100, 20) + R(6, 26, 88, 50, 6) + R(12, 34, 16, 16, 2) + R(32, 34, 16, 16, 2) + R(52, 34, 16, 16, 2) + R(72, 34, 16, 16, 2) + C(26, 76, 9) + C(74, 76, 9) + C(26, 76, 3.5) + C(74, 76, 3.5) + R(88, 58, 6, 8, 2); } },
+    { id: 'bicicleta', nome: 'Bicicleta', tags: 'bicicleta bike bici pedal', fn: function () {
+      return BG + R(0, 88, 100, 12) + C(24, 66, 20) + C(76, 66, 20) + C(24, 66, 13) + C(76, 66, 13) + C(24, 66, 3) + C(76, 66, 3) + L('M24 66 L44 66 L58 40 L76 66 M44 66 L36 40 L58 40 M36 40 L30 38 M58 40 L68 38 L72 44'); } },
+    { id: 'helicoptero', nome: 'Helicóptero', tags: 'helicoptero helicopteros voar helice', fn: function () {
+      return BG + C(86, 14, 8) + R(8, 20, 84, 5, 2) + R(47, 24, 6, 10) + E(46, 52, 28, 18) + R(70, 46, 26, 7, 3) + P('90,38 98,38 96,48 90,48') + E(36, 50, 12, 9) + R(26, 74, 40, 4, 2) + R(34, 66, 3, 8) + R(56, 66, 3, 8); } },
+    { id: 'pizza', nome: 'Pizza', tags: 'pizza fatia calabresa comida lanche', fn: function () {
+      return BG + P('50,94 8,22 92,22') + D('M6 20 Q50 4 94 20 L92 28 Q50 14 8 28 Z') + C(40, 40, 6) + C(60, 40, 6) + C(50, 58, 6) + C(50, 78, 4); } },
+    { id: 'banana', nome: 'Banana', tags: 'banana bananinha fruta macaco', fn: function () {
+      return BG + D('M16 30 Q34 82 86 66 Q90 62 88 58 Q56 70 28 22 Q18 20 16 30 Z') + R(14, 14, 8, 12, 2); } },
+    { id: 'uva', nome: 'Uva', tags: 'uva uvas fruta vinho cacho', fn: function () {
+      return BG + R(48, 6, 5, 16, 2) + E(66, 14, 14, 7, -20) + C(34, 34, 11) + C(56, 34, 11) + C(78, 34, 11) + C(44, 54, 11) + C(66, 54, 11) + C(55, 74, 11); } },
+    { id: 'morango', nome: 'Morango', tags: 'morango morangos fruta vermelha', fn: function () {
+      return BG + D('M50 94 Q8 66 14 36 Q22 22 50 28 Q78 22 86 36 Q92 66 50 94 Z') + P('50,30 34,16 42,24 28,24 44,30') + P('50,30 66,16 58,24 72,24 56,30') + C(38, 46, 2.4) + C(58, 44, 2.4) + C(48, 58, 2.4) + C(66, 58, 2.4) + C(36, 66, 2.4) + C(54, 74, 2.4); } },
+    { id: 'cenoura', nome: 'Cenoura', tags: 'cenoura cenouras legume coelho horta', fn: function () {
+      return BG + P('32,30 68,30 50,96') + P('50,30 36,6 48,24') + P('50,30 50,2 56,24') + P('50,30 64,6 54,24') + L('M38 42 L46 42 M54 56 L62 56 M42 66 L50 66'); } },
+    { id: 'bola', nome: 'Bola', tags: 'bola bolinha futebol esporte jogo', fn: function () {
+      return BG + R(0, 90, 100, 10) + C(50, 50, 42) + P('50,34 64,44 59,60 41,60 36,44') + P('50,34 50,10 62,14 64,44') + P('50,34 50,10 38,14 36,44') + P('36,44 12,40 12,58 41,60') + P('64,44 88,40 88,58 59,60'); } },
+    { id: 'guardachuva', nome: 'Guarda-chuva', tags: 'guarda-chuva guardachuva chuva sombrinha', fn: function () {
+      return BG + D('M6 52 Q10 12 50 10 Q90 12 94 52 Q84 44 72 52 Q61 44 50 52 Q39 44 28 52 Q16 44 6 52 Z') + R(48, 50, 4, 34) + D('M52 84 Q52 94 42 94 Q36 94 36 88 L40 88 Q40 90 42 90 Q48 90 48 84 Z'); } },
     { id: 'livre', nome: 'Em branco', tags: 'branco livre vazio folha desenho-livre', fn: function () { return BG; } }
   ];
   var DRAWMAP = {}; DRAW.forEach(function (d) { DRAWMAP[d.id] = d; });
 
   function norm(s) { return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z\s-]/g, ' ').replace(/\s+/g, ' ').trim(); }
   var STOP = { um: 1, uma: 1, o: 1, a: 1, os: 1, as: 1, de: 1, do: 1, da: 1, dos: 1, das: 1, desenho: 1, quero: 1, pintar: 1, com: 1, e: 1, para: 1, meu: 1, minha: 1 };
+  function lev(a, b) {
+    var m = a.length, n = b.length, i, j, prev, cur;
+    if (Math.abs(m - n) > 2) return 9;
+    prev = []; for (j = 0; j <= n; j++) prev.push(j);
+    for (i = 1; i <= m; i++) {
+      cur = [i];
+      for (j = 1; j <= n; j++) cur.push(Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1)));
+      prev = cur;
+    }
+    return prev[n];
+  }
+  function stems(t) {
+    var v = [t], x = t;
+    x = x.replace(/oes$/, 'ao').replace(/aes$/, 'ao').replace(/ois$/, 'ol').replace(/(ns)$/, 'm').replace(/(res|zes|ses)$/, function (m) { return m.slice(0, -2); }).replace(/s$/, '');
+    v.push(x);
+    var y = x.replace(/(z?inh[oa]s?|z?it[oa]s?|ao)$/, '');
+    if (y.length >= 3) { v.push(y); v.push(y + 'o'); v.push(y + 'a'); }
+    return v.filter(function (e, i) { return e.length >= 3 && v.indexOf(e) === i; });
+  }
   function searchDraw(q) {
     var tokens = norm(q).split(' ').filter(function (t) { return t.length > 1 && !STOP[t]; });
     if (!tokens.length) return DRAW.slice();
@@ -779,19 +836,23 @@ canvas.brush { touch-action: none; }
     DRAW.forEach(function (d) {
       var tags = norm(d.tags + ' ' + d.nome).split(' '), s = 0;
       tokens.forEach(function (t) {
-        var vars = [t, t.replace(/s$/, ''), t.replace(/es$/, ''), t.replace(/oes$/, 'ao')];
-        vars.forEach(function (v, vi) {
-          if (v.length < 2) return;
+        var best = 0;
+        stems(t).forEach(function (v, vi) {
           tags.forEach(function (g) {
-            if (g === v) s += vi === 0 ? 10 : 8;
-            else if (v.length >= 3 && (g.indexOf(v) === 0 || v.indexOf(g) === 0 && g.length >= 4)) s += 5;
-            else if (v.length >= 4 && g.indexOf(v) >= 0) s += 2;
+            var sc = 0;
+            if (g === v) sc = vi === 0 ? 10 : 8;
+            else if (g.length >= 3 && v.length >= 3 && g.indexOf(v) === 0 && g.length - v.length <= 3) sc = 5;
+            else if (v.length >= 4 && g.length >= 4 && v.indexOf(g) === 0 && v.length - g.length <= 3) sc = 5;
+            else if (v.length >= 5 && g.length >= 5 && lev(v, g) <= (v.length >= 7 ? 2 : 1)) sc = 4;
+            if (sc > best) best = sc;
           });
         });
+        s += best;
       });
       if (s > 0) out.push({ d: d, s: s });
     });
     out.sort(function (a, b) { return b.s - a.s; });
+    if (out.length) { var top = out[0].s; out = out.filter(function (x) { return x.s > top * 0.5; }); }
     return out.map(function (x) { return x.d; });
   }
 
@@ -1076,19 +1137,6 @@ canvas.brush { touch-action: none; }
       var set = shuffle(BICHOS).slice(0, k), t = set[rand(k)];
       return { prompt: '<span>' + t[0] + '</span>', speech: t[1] + '. Qual é a sombra?', praise: 'Isso! ' + t[1] + '!',
         choices: set.map(function (a) { return { html: '<span class="sil">' + a[0] + '</span>', ok: a === t, label: 'sombra' }; }) };
-    });
-  }
-
-  /* ---------- QUAL É O SOM? ---------- */
-  var SONS = [['🐶', 'cachorro', 'Au au au!'], ['🐱', 'gato', 'Miau!'], ['🐮', 'vaca', 'Muuu!'], ['🐷', 'porquinho', 'Oinc oinc!'], ['🦆', 'pato', 'Quá quá quá!'],
-              ['🐔', 'galinha', 'Có có có có!'], ['🐑', 'ovelha', 'Mééé!'], ['🐴', 'cavalo', 'Rihihi!'], ['🦁', 'leão', 'Grrrr!'], ['🐸', 'sapo', 'Ru ru ru!'],
-              ['🐵', 'macaco', 'Ih ih ah ah!'], ['🐝', 'abelha', 'Zzzzz!']];
-  function som(area, o) {
-    var k = o.k;
-    quiz(area, function () {
-      var set = shuffle(SONS).slice(0, k), t = set[rand(k)];
-      return { prompt: '<span>🔊<span class="cap">' + t[2] + '</span></span>', speech: t[2] + ' Quem faz assim?', praise: 'Isso! ' + t[1] + '!',
-        choices: set.map(function (a) { return { html: '<span>' + a[0] + '</span>', ok: a === t, label: a[1] }; }) };
     });
   }
 
@@ -1392,10 +1440,6 @@ canvas.brush { touch-action: none; }
       groups: [{ key: 'mode', label: 'O que achar', def: 0, options: [{ label: 'Formas', value: 'shape' }, { label: 'Cores', value: 'color' }, { label: 'Formas e cores', value: 'both' }] }, { key: 'k', label: 'Quantas opções', def: 1, options: [{ label: '2', value: 2 }, { label: '3', value: 3 }, { label: '4', value: 4 }] }],
       actions: [{ label: 'Jogar', mode: 'play', primary: true }],
       icon: '<span class="emo">🔺</span>' },
-    { id: 'som', title: 'Qual é o Som?', desc: 'Ouça e ache o bichinho', run: som,
-      groups: [{ key: 'k', label: 'Quantas opções', def: 1, options: [{ label: '2', value: 2 }, { label: '3', value: 3 }, { label: '4', value: 4 }] }],
-      actions: [{ label: 'Jogar', mode: 'play', primary: true }],
-      icon: '<span class="emo">🔊</span>' },
     { id: 'letra', title: 'Primeira Letra', desc: 'Com qual letra começa?', run: letra,
       groups: [{ key: 'k', label: 'Quantas letras', def: 0, options: [{ label: '2', value: 2 }, { label: '3', value: 3 }, { label: '4', value: 4 }] }],
       actions: [{ label: 'Jogar', mode: 'play', primary: true }],
