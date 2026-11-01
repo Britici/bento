@@ -176,7 +176,7 @@ h1 { font-size: clamp(28px, 7.4vw, 40px); line-height: 1.05; margin: 0; font-wei
 @keyframes bounce { from { transform: scale(1) rotate(-6deg); } to { transform: scale(1.14) rotate(6deg); } }
 
 /* memória */
-.mgrid { display: grid; gap: 10px; width: 100cqw; height: 100cqh; }
+.mgrid { display: grid; gap: 8px; width: 100cqw; height: 100cqh; }
 .mcard { container-type: size; position: relative; background: none; border: 0; padding: 0; min-width: 0; min-height: 0; cursor: pointer; perspective: 700px; }
 .mcard .inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .4s; }
 .mcard.open .inner { transform: rotateY(180deg); }
@@ -518,11 +518,12 @@ canvas.brush { touch-action: none; }
 
   /* ---------- MEMÓRIA (1 ou 2 jogadores) ---------- */
   var BICHOS = [['🐶', 'cachorro'], ['🐱', 'gato'], ['🐸', 'sapo'], ['🐵', 'macaco'], ['🐰', 'coelho'], ['🦁', 'leão'],
-                ['🐷', 'porquinho'], ['🐻', 'urso'], ['🐼', 'panda'], ['🐮', 'vaquinha'], ['🐯', 'tigre'], ['🦊', 'raposa']];
+                ['🐷', 'porquinho'], ['🐻', 'urso'], ['🐼', 'panda'], ['🐮', 'vaquinha'], ['🐯', 'tigre'], ['🦊', 'raposa'],
+                ['🐔', 'galinha'], ['🐘', 'elefante'], ['🐢', 'tartaruga'], ['🐴', 'cavalo']];
   function memoria(area, o, mode, api) {
     var pairs = o.pairs, players = o.players;
     var chosen = shuffle(BICHOS).slice(0, pairs), deck = shuffle(chosen.concat(chosen));
-    var cols = pairs === 6 ? 3 : 2, rows = deck.length / cols;
+    var cols = deck.length <= 8 ? 2 : deck.length <= 12 ? 3 : 4, rows = deck.length / cols;
     area.innerHTML = (players === 2 ? scoresHTML() : '') + '<div class="status small" aria-live="polite"></div><div class="stage"><div class="mgrid"></div></div>' +
       '<div class="bottom" data-show="false"><button class="big primary" type="button">Jogar de novo</button></div>';
     var statusEl = area.querySelector('.status'), grid = area.querySelector('.mgrid'), bottom = area.querySelector('.bottom');
@@ -983,7 +984,7 @@ canvas.brush { touch-action: none; }
       actions: [{ label: 'Jogar com o computador', small: 'Você é o X', mode: 'cpu', primary: true }, { label: 'Jogar com outra pessoa', small: 'X e bola, um de cada vez', mode: 'pvp' }],
       icon: '<svg viewBox="0 0 64 64"><path d="M22 8v48M42 8v48M8 22h48M8 42h48" stroke="var(--ink-soft)" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M11 11l8 8M19 11l-8 8" stroke="var(--star)" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="32" r="5" fill="none" stroke="var(--ball)" stroke-width="4"/><path d="M45 45l8 8M53 45l-8 8" stroke="var(--star)" stroke-width="4" stroke-linecap="round"/></svg>' },
     { id: 'memoria', title: 'Memória', desc: 'Ache os pares de bichinhos', run: memoria,
-      groups: [{ key: 'pairs', label: 'Quantos pares', options: [{ label: '3 pares', value: 3 }, { label: '4 pares', value: 4 }, { label: '6 pares', value: 6 }] }, players()],
+      groups: [{ key: 'pairs', label: 'Quantos pares', options: [{ label: '3 pares', value: 3 }, { label: '4 pares', value: 4 }, { label: '6 pares', value: 6 }, { label: '8 pares', value: 8 }, { label: '10 pares', value: 10 }, { label: '12 pares', value: 12 }] }, players()],
       actions: [{ label: 'Jogar', mode: 'play', primary: true }],
       icon: '<svg viewBox="0 0 64 64"><rect x="6" y="12" width="24" height="36" rx="6" fill="var(--accent)"/><rect x="34" y="16" width="24" height="36" rx="6" fill="var(--tile)" stroke="var(--ball)" stroke-width="4"/><text x="18" y="39" text-anchor="middle" font-size="22" font-weight="700" fill="#fff" font-family="inherit">?</text><circle cx="46" cy="34" r="7" fill="#ffb800"/></svg>' },
     { id: 'baloes', title: 'Balões', desc: 'Toque nos balões para estourar', run: baloes,
