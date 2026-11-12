@@ -188,40 +188,6 @@ h1 { font-size: clamp(28px, 7.4vw, 40px); line-height: 1.05; margin: 0; font-wei
 .face.front { background: var(--tile); border: 3px solid var(--tile-edge); transform: rotateY(180deg); }
 .mcard.ok .face.front { background: var(--win); border-color: var(--accent); }
 
-/* balões */
-.sky { position: relative; width: 100cqw; height: 100cqh; overflow: hidden; border-radius: 26px; background: linear-gradient(var(--sky-a), var(--sky-b)); border: 3px solid var(--tile-edge); }
-.b-move { position: absolute; top: 0; pointer-events: none; animation: rise linear forwards; }
-.b-move button {
-  pointer-events: auto; display: block; width: 100%; height: calc(var(--w) * 1.22); border: 0; padding: 0; cursor: pointer;
-  border-radius: 50% 50% 48% 48%; position: relative; transform-origin: 50% 100%;
-  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.6) 0 11%, transparent 12%), var(--c);
-}
-.b-move button::after { content: ""; position: absolute; left: 50%; top: 100%; width: 3px; height: 40px; background: rgba(0,0,0,.25); transform: translateX(-50%); }
-.b-move button.pop { animation: boom .22s ease-out forwards; pointer-events: none; }
-@keyframes rise { from { transform: translateY(var(--h)); } to { transform: translateY(calc(-1 * var(--bh))); } }
-@keyframes boom { to { transform: scale(1.5); opacity: 0; } }
-
-/* pintar */
-.paintwrap { position: relative; width: 100%; height: 100%; border-radius: 22px; overflow: hidden; border: 3px solid var(--tile-edge); background: var(--paper); }
-.paintwrap > * { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.paint .reg { fill: var(--paper); stroke: #1d2b4a; stroke-width: 1.2; stroke-linejoin: round; cursor: pointer; }
-.paint .ln { fill: none; stroke: #1d2b4a; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
-.paint.lines, .paint.lines * { pointer-events: none; }
-.paint.lines .reg { fill: none; }
-canvas.brush { touch-action: none; }
-.m-fill canvas.brush { pointer-events: none; }
-.m-brush canvas.brush { pointer-events: auto; cursor: crosshair; }
-.tools { flex: none; display: grid; grid-template-columns: 1.4fr 1fr .95fr 1.25fr 1fr; gap: 6px; }
-.tbtn {
-  font-weight: 600; font-size: 13px; color: var(--ink); background: var(--tile); border: 3px solid var(--tile-edge);
-  border-radius: 14px; min-height: 44px; padding: 2px; cursor: pointer; white-space: nowrap; min-width: 0;
-}
-.tbtn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
-.t-fill #sizeBtn { opacity: .35; pointer-events: none; }
-.palette { flex: none; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-.sw { height: 42px; border-radius: 14px; border: 3px solid var(--tile-edge); cursor: pointer; padding: 0; font-weight: 600; font-size: 12px; color: var(--ink); background: var(--tile); }
-.sw[aria-pressed="true"] { outline: 4px solid var(--ink); outline-offset: 1px; }
-
 /* contar */
 .items { display: grid; width: 100cqw; height: 100cqh; }
 .it { font-size: inherit; display: grid; place-items: center; background: none; border: 0; padding: 0; cursor: pointer; position: relative; line-height: 1; min-width: 0; min-height: 0; color: inherit; }
@@ -319,31 +285,13 @@ canvas.brush { touch-action: none; }
 .gfield { position: relative; height: min(100cqh, 160cqw); aspect-ratio: 5 / 8; border-radius: 22px; overflow: hidden; box-shadow: 0 0 0 3px var(--tile-edge); background: #1b9a50; }
 .gfield canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
 
-/* quebra-cabeça */
-.pzboard { position: absolute; inset: 0; display: grid; gap: 3px; background: var(--tile-edge); border-radius: 16px; overflow: hidden; border: 3px solid var(--tile-edge); }
-.pzcell { padding: 0; border: 0; background: var(--paper); overflow: hidden; position: relative; cursor: pointer; min-width: 0; min-height: 0; }
-.pzcell svg { width: 100%; height: 100%; display: block; }
-.pzcell .reg { cursor: pointer; }
-.pzcell.sel { outline: 6px solid var(--accent); outline-offset: -6px; z-index: 1; }
-.pzcell.ok { cursor: default; outline: 3px solid #22c55e; outline-offset: -3px; }
-.pzhint { position: absolute; inset: 0; z-index: 3; background: var(--paper); border-radius: 16px; overflow: hidden; border: 3px solid var(--accent); }
-.pzhint svg { width: 100%; height: 100%; display: block; }
-
 .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20; }
 .confetti i { position: absolute; top: -20px; width: 12px; height: 18px; border-radius: 3px; animation: fall linear forwards; }
 @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
-.hub-top { display: flex; gap: 10px; flex: none; }
-.tbtn { flex: 1; min-height: 52px; font: inherit; font-weight: 700; font-size: clamp(16px, 4.4vw, 20px); color: var(--ink); background: var(--tile); border: 3px solid var(--tile-edge); border-bottom-width: 6px; border-radius: 18px; cursor: pointer; padding: 6px 10px; }
-.tbtn:active { transform: translateY(2px); border-bottom-width: 4px; }
+.hub-sort { display: flex; align-items: center; gap: 8px; flex: none; flex-wrap: wrap; }
+.hub-sort .slabel { font-weight: 700; font-size: 15px; color: var(--ink-soft); }
+.hub-sort .chip { min-height: 44px; padding: 6px 14px; }
 .gcard { position: relative; }
-.gcard .today { position: absolute; top: 8px; right: 8px; background: var(--accent); color: var(--accent-ink); font-size: 13px; font-weight: 700; padding: 2px 9px; border-radius: 999px; }
-.stk-toast { position: fixed; left: 50%; top: 12%; transform: translateX(-50%) scale(.6); background: var(--tile); border: 3px solid var(--accent); border-radius: 24px; padding: 10px 20px; display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 20px; color: var(--ink); z-index: 60; opacity: 0; pointer-events: none; transition: transform .35s, opacity .35s; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
-.stk-toast.on { opacity: 1; transform: translateX(-50%) scale(1); }
-.stk-toast .e { font-size: 46px; line-height: 1; }
-.album-grid { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; align-content: start; padding: 2px 2px 10px; }
-.stk { aspect-ratio: 1; border-radius: 18px; border: 3px solid var(--tile-edge); background: var(--tile); font-size: clamp(30px, 9vw, 46px); display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; color: var(--ink-soft); font-family: inherit; font-weight: 700; }
-.stk.lock { background: var(--tile-edge); opacity: .55; cursor: default; }
-.stk.new { border-color: var(--accent); }
 @media (prefers-reduced-motion: reduce) {
   .cell.pop svg, .cell.win svg { animation: none; }
   .confetti { display: none; }
@@ -355,7 +303,7 @@ canvas.brush { touch-action: none; }
 <div id="app">
   <section id="hub" class="screen">
     <div class="hub-head"><h1>Cantinho dos Jogos</h1><div class="hub-btns"><button class="small-btn" id="btnVoz" type="button">Voz</button><button class="small-btn snd" type="button"></button></div></div>
-    <div class="hub-top"><button class="tbtn" id="btnSurp" type="button">🎲 Surpresa</button><button class="tbtn" id="btnAlbum" type="button"></button></div>
+    <div class="hub-sort" id="hubSort"></div>
     <div class="hub-grid" id="hubGrid"></div>
   </section>
   <section id="gmenu" class="screen" hidden></section>
@@ -368,7 +316,6 @@ canvas.brush { touch-action: none; }
     <div class="play-area" id="playArea"></div>
   </section>
   <section id="settings" class="screen" hidden></section>
-  <section id="album" class="screen" hidden></section>
 </div>
 <div class="confetti" id="confetti" aria-hidden="true"></div>
 
@@ -393,7 +340,7 @@ canvas.brush { touch-action: none; }
 
   /* ---------- ajustes salvos no aparelho ---------- */
   var KEY = 'cantinho.cfg';
-  var cfg = { sound: true, voice: true, voiceName: '', rate: 0.95 };
+  var cfg = { sound: true, voice: true, voiceName: '', rate: 0.95, sort: 'default' };
   try { var saved = JSON.parse(localStorage.getItem(KEY) || '{}'); Object.keys(cfg).forEach(function (k) { if (k in saved) cfg[k] = saved[k]; }); } catch (e) {}
   function saveCfg() { try { localStorage.setItem(KEY, JSON.stringify(cfg)); } catch (e) {} }
 
@@ -483,7 +430,6 @@ canvas.brush { touch-action: none; }
   function stopSpeech() { uref = null; try { if (synth) synth.cancel(); } catch (e) {} }
 
   function confetti() {
-    giveSticker();
     var box = $('confetti'), colors = ['#ffb800', '#12a9a0', '#ff6b57', '#7c5cff', '#4cc9f0'];
     for (var i = 0; i < 46; i++) {
       var e = document.createElement('i');
@@ -677,482 +623,7 @@ canvas.brush { touch-action: none; }
     if (players === 2) speak('Vez do jogador 1');
   }
 
-  /* ---------- BALÕES ---------- */
-  function baloes(area, o, mode, api) {
-    var speed = o.speed;
-    area.innerHTML = '<div class="status small">Balões estourados: <span class="n">0</span></div><div class="stage"><div class="sky"></div></div>';
-    var sky = area.querySelector('.sky'), nEl = area.querySelector('.n'), count = 0;
-    var COLORS = ['#ff6b57', '#ffb800', '#12a9a0', '#7c5cff', '#ff5fa2', '#3b82f6'];
-    function spawn(delaySec) {
-      if (sky.children.length > 9) return;
-      var W = sky.clientWidth, H = sky.clientHeight; if (!W || !H) return;
-      var w = Math.round(W * (0.2 + Math.random() * 0.08)), dur = (speed === 'calm' ? 10 : 7) + Math.random() * 3;
-      var el = document.createElement('div'); el.className = 'b-move';
-      el.style.left = Math.round(Math.random() * (W - w)) + 'px'; el.style.width = w + 'px';
-      el.style.setProperty('--w', w + 'px'); el.style.setProperty('--h', H + 'px'); el.style.setProperty('--bh', Math.round(w * 1.22 + 60) + 'px');
-      el.style.animationDuration = dur + 's'; if (delaySec) el.style.animationDelay = '-' + delaySec + 's';
-      var b = document.createElement('button'); b.type = 'button'; b.style.setProperty('--c', pick(COLORS)); b.setAttribute('aria-label', 'Balão');
-      b.addEventListener('pointerdown', function (e) {
-        e.preventDefault(); if (b.classList.contains('pop')) return;
-        b.classList.add('pop'); count++; nEl.textContent = count; beep(480 + Math.random() * 500, 0.08, 'square');
-        if (count % 10 === 0) { sfxWin(); confetti(); speak(count + ' balões!'); }
-        later(function () { el.remove(); }, 260);
-      });
-      el.appendChild(b); el.addEventListener('animationend', function (e) { if (e.target === el) el.remove(); });
-      sky.appendChild(el);
-    }
-    later(function () { for (var i = 0; i < 4; i++) spawn(2 + i * 1.6); }, 50);
-    var iv = setInterval(function () { spawn(0); }, speed === 'calm' ? 1100 : 750);
-    api.onStop(function () { clearInterval(iv); });
-  }
-
-  /* ---------- BIBLIOTECA DE DESENHOS ---------- */
-  function R(x, y, w, h, r) { return '<rect class="reg" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"' + (r ? ' rx="' + r + '"' : '') + '/>'; }
-  function C(x, y, r) { return '<circle class="reg" cx="' + x + '" cy="' + y + '" r="' + r + '"/>'; }
-  function E(x, y, rx, ry, rot) { return '<ellipse class="reg" cx="' + x + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '"' + (rot ? ' transform="rotate(' + rot + ' ' + x + ' ' + y + ')"' : '') + '/>'; }
-  function P(pts) { return '<polygon class="reg" points="' + pts + '"/>'; }
-  function D(d, t) { return '<path class="reg" d="' + d + '"' + (t ? ' transform="' + t + '"' : '') + '/>'; }
-  function L(d) { return '<path class="ln" d="' + d + '"/>'; }
-  function pt(cx, cy, r, a) { return (cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1); }
-  function STR(cx, cy, r, k) {
-    var p = []; for (var i = 0; i < 10; i++) p.push(pt(cx, cy, i % 2 ? r * (k || 0.45) : r, -Math.PI / 2 + i * Math.PI / 5));
-    return P(p.join(' '));
-  }
-  var BG = R(0, 0, 100, 100);
   var HEART = 'M50 88 C10 58 6 30 28 22 C40 18 48 26 50 34 C52 26 60 18 72 22 C94 30 90 58 50 88 Z';
-  /* ajudantes de desenho: mudar escala/posição de um caminho, sol, nuvem, olhos... */
-  function xf(d, s, tx, ty) {
-    return d.replace(/([MLCQ])([^MLCQZ]*)/g, function (m, c, rest) {
-      var n = rest.match(/-?\d*\.?\d+/g) || [], o = [];
-      for (var i = 0; i < n.length; i += 2) o.push((n[i] * s + tx).toFixed(1) + ' ' + (n[i + 1] * s + ty).toFixed(1));
-      return c + o.join(' ');
-    });
-  }
-  function TD(d, s, tx, ty) { return D(xf(d, s, tx, ty)); }
-  function MIR(d) { return d.replace(/([MLCQ])([^MLCQZ]*)/g, function (m, c, rest) { var n = rest.match(/-?\d*\.?\d+/g) || [], o = []; for (var i = 0; i < n.length; i += 2) o.push((100 - n[i]) + ' ' + n[i + 1]); return c + o.join(' '); }); }
-  function PAIR(d) { return D(d) + D(MIR(d)); }
-  function GR(y) { return D('M0 ' + y + ' C22 ' + (y - 7) + ' 62 ' + (y + 5) + ' 100 ' + (y - 3) + ' L100 100 L0 100 Z'); }
-  function SUN(x, y, r) { var s = C(x, y, r), k, a; for (k = 0; k < 8; k++) { a = k * Math.PI / 4; s += L('M' + pt(x, y, r + 2.2, a) + ' L' + pt(x, y, r + 5.4, a)); } return s; }
-  function CLD(x, y, s) { return D(xf('M22 78 C8 78 6 56 22 54 C20 36 40 28 50 40 C56 24 82 26 82 46 C98 46 98 78 80 78 Z', s, x - 50 * s, y - 52 * s)); }
-  function EYE(x, y, r) { return C(x, y, r) + C(x + r * 0.2, y + r * 0.1, r * 0.5); }
-  function CHK(x, y) { return E(x, y, 3.6, 2.4); }
-  /* perna/galho: linha grossa que vira região pintável */
-  function LEG(p, w) {
-    var a = [], b = [], i, dx, dy, l, q, nx, ny;
-    for (i = 0; i < p.length; i++) {
-      q = p[Math.min(i + 1, p.length - 1)]; dx = q[0] - p[Math.max(i - 1, 0)][0]; dy = q[1] - p[Math.max(i - 1, 0)][1]; l = Math.sqrt(dx * dx + dy * dy) || 1;
-      nx = -dy / l * w / 2; ny = dx / l * w / 2; a.push([p[i][0] + nx, p[i][1] + ny]); b.push([p[i][0] - nx, p[i][1] - ny]);
-    }
-    b.reverse(); var all = a.concat(b);
-    return D('M' + all.map(function (v) { return v[0].toFixed(1) + ' ' + v[1].toFixed(1); }).join(' L') + ' Z');
-  }
-
-  var DRAW = [
-    { id: 'casa', nome: 'Casa', tags: 'casa lar moradia', fn: function () {
-      return BG + SUN(86, 14, 7) + CLD(26, 20, .34) + CLD(66, 12, .24) + D('M0 82 C25 74 60 86 100 78 L100 100 L0 100 Z') +
-        R(62, 20, 11, 26, 1.5) + R(20, 48, 60, 40, 1.5) + P('9,52 50,14 91,52') + C(50, 34, 6) + L('M44 34 L56 34 M50 28 L50 40') +
-        D('M43 88 L43 68 Q43 62 50 62 Q57 62 57 68 L57 88 Z') + C(53, 76, 1.2) +
-        R(26, 58, 13, 13, 2) + L('M32.5 58 L32.5 71 M26 64.5 L39 64.5') + R(61, 58, 13, 13, 2) + L('M67.5 58 L67.5 71 M61 64.5 L74 64.5') +
-        D('M43 88 L57 88 L70 100 L30 100 Z') + D('M2 92 C0 78 22 78 20 92 Z') + D('M84 94 C82 82 100 82 98 94 Z'); } },
-    { id: 'flor', nome: 'Flor', tags: 'flor flores florzinha margarida jardim', fn: function () {
-      var s = BG + SUN(14, 14, 7) + CLD(78, 16, .3) + D('M0 86 C25 80 62 92 100 84 L100 100 L0 100 Z') +
-        D('M47 48 C45 64 51 76 47 92 L54 92 C58 76 52 64 53 48 Z') + D('M50 76 C38 66 26 68 20 58 C32 54 46 62 50 76 Z') + D('M51 70 C62 60 74 62 80 52 C68 48 54 56 51 70 Z');
-      for (var k = 0; k < 8; k++) { var a = k * Math.PI / 4; s += E((50 + 16 * Math.sin(a)).toFixed(1), (36 - 16 * Math.cos(a)).toFixed(1), 7.5, 11.5, k * 45); }
-      return s + C(50, 36, 10) + C(50, 36, 4); } },
-    { id: 'peixe', nome: 'Peixe', tags: 'peixe peixinho mar aquario', fn: function () {
-      return BG + D('M0 90 C20 84 60 94 100 88 L100 100 L0 100 Z') + D('M12 94 C4 80 18 70 10 56 C20 68 8 80 20 94 Z') + D('M86 94 C80 80 92 72 86 60 C96 72 84 80 94 94 Z') +
-        L('M0 10 Q8 6 16 10 T32 10 T48 10 T64 10 T80 10 T96 10') +
-        D('M74 50 L94 32 C90 44 90 56 94 68 Z') + D('M8 50 C16 32 48 26 70 40 C76 44 76 46 76 50 C76 54 76 56 70 60 C48 74 16 68 8 50 Z') +
-        D('M36 31 C40 18 54 20 58 35 Z') + D('M44 67 C46 78 56 78 58 66 Z') + C(24, 46, 4.5) + C(25, 46, 2) + L('M10 54 Q14 56 18 54 M32 38 Q38 50 32 62 M46 44 Q50 50 46 56 M56 42 Q60 50 56 58 M66 46 Q69 50 66 54') +
-        C(14, 30, 3) + C(20, 22, 2.2) + C(12, 16, 1.6) + C(84, 24, 2.6) + C(88, 14, 1.8); } },
-    { id: 'carro', nome: 'Carro', tags: 'carro carrinho automovel veiculo', fn: function () {
-      return BG + SUN(86, 14, 7) + CLD(30, 16, .32) + R(0, 80, 100, 20) + L('M6 91 L22 91 M34 91 L50 91 M62 91 L78 91 M90 91 L100 91') +
-        D('M8 68 L8 58 Q8 51 16 50 L28 48 L36 33 Q38 29 44 29 L66 29 Q72 29 76 34 L84 48 L90 50 Q94 52 94 59 L94 68 Q94 72 90 72 L12 72 Q8 72 8 68 Z') +
-        D('M32 48 L39 34 L50 34 L50 48 Z') + D('M54 48 L54 34 L65 34 L72 48 Z') + L('M52 48 L52 70 M44 57 L49 57') + C(90, 59, 3.2) + R(8, 56, 4, 7, 1) +
-        C(27, 73, 9) + C(27, 73, 4.2) + C(75, 73, 9) + C(75, 73, 4.2); } },
-    { id: 'foguete', nome: 'Foguete', tags: 'foguete nave espaco astronauta', fn: function () {
-      return BG + STR(14, 16, 5) + STR(84, 12, 4) + STR(92, 48, 3.5) + STR(9, 58, 3.5) + STR(74, 80, 4) + C(86, 78, 9) + L('M74 78 Q86 84 98 78') +
-        D('M40 74 C36 88 50 98 50 98 C50 98 64 88 60 74 Z') + D('M45 74 C44 82 50 88 50 88 C50 88 56 82 55 74 Z') +
-        D('M38 52 C26 56 22 68 20 82 L38 70 Z') + D('M62 52 C74 56 78 68 80 82 L62 70 Z') +
-        D('M50 6 C64 18 68 40 66 72 L34 72 C32 40 36 18 50 6 Z') + D('M50 6 C56 12 60 18 62 26 L38 26 C40 18 44 12 50 6 Z') +
-        C(50, 44, 8) + C(50, 44, 4.5) + D('M34.2 58 L65.8 58 L65.9 64 L34.1 64 Z') + D('M40 72 L60 72 L57 78 L43 78 Z'); } },
-    { id: 'borboleta', nome: 'Borboleta', tags: 'borboleta inseto', fn: function () {
-      return BG + SUN(86, 14, 7) + CLD(22, 16, .3) + GR(90) + L('M16 96 L16 86 M50 98 L50 88 M84 96 L84 86') + C(16, 83, 4) + C(50, 85, 4) + C(84, 83, 4) +
-        PAIR('M52 46 C56 28 70 10 86 10 C98 12 96 36 78 46 C70 50 60 50 52 46 Z') + PAIR('M52 52 C62 50 78 52 86 62 C92 72 84 90 70 86 C58 82 52 66 52 52 Z') +
-        C(80, 28, 6) + C(20, 28, 6) + C(72, 72, 5) + C(28, 72, 5) + E(50, 56, 4.5, 20) + C(50, 34, 5) + L('M48 31 Q42 22 38 18 M52 31 Q58 22 62 18') + C(38, 18, 1.6) + C(62, 18, 1.6); } },
-    { id: 'arvore', nome: 'Árvore', tags: 'arvore planta floresta pe', fn: function () {
-      return BG + SUN(86, 14, 7) + CLD(24, 16, .32) + GR(86) + D('M43 62 L43 90 L57 90 L57 62 Z') + L('M50 80 L44 72 M50 74 L57 68') +
-        D('M50 8 C62 8 70 14 72 24 C86 24 94 36 90 48 C94 60 84 70 70 68 L30 68 C16 70 6 60 10 48 C6 36 14 24 28 24 C30 14 38 8 50 8 Z') +
-        C(34, 36, 3.6) + C(62, 30, 3.6) + C(50, 50, 3.6) + C(74, 52, 3.6) + C(26, 54, 3.6) + C(48, 22, 3.6); } },
-    { id: 'sorvete', nome: 'Sorvete', tags: 'sorvete picole doce casquinha', fn: function () {
-      return BG + STR(12, 14, 5) + STR(88, 20, 4) + STR(86, 70, 3.5) + STR(12, 62, 3.5) +
-        D('M30 56 L70 56 L50 98 Z') + L('M38 56 L56 90 M46 56 L62 78 M62 56 L44 90 M54 56 L38 78') +
-        D('M24 58 C18 54 20 44 28 42 C26 30 38 22 50 22 C62 22 74 30 72 42 C80 44 82 54 76 58 C70 62 66 56 62 58 C58 64 52 60 50 60 C46 62 42 64 38 58 C34 56 28 62 24 58 Z') +
-        D('M34 30 C32 16 42 8 50 8 C58 8 68 16 66 30 C58 34 42 34 34 30 Z') + C(50, 6, 4.5) + L('M50 2 Q52 -2 56 -2') +
-        C(40, 44, 2.2) + C(58, 46, 2.2) + C(50, 52, 2.2) + C(44, 20, 2) + C(58, 22, 2); } },
-    { id: 'gato', nome: 'Gato', tags: 'gato gatinho gata felino bichano', fn: function () {
-      return BG + SUN(88, 12, 6) + GR(92) +
-        D('M70 90 C88 90 94 70 86 58 C84 68 80 76 70 80 Z') + D('M30 62 C22 80 26 94 40 96 L60 96 C74 94 78 80 70 62 Z') + E(50, 82, 11, 12) + E(41, 96, 7, 3.6) + E(59, 96, 7, 3.6) +
-        TD('M50 26 Q55 26 61 29 L84 8 L86 40 C96 56 88 90 50 92 C12 90 4 56 14 40 L16 8 L39 29 Q45 26 50 26 Z', .66, 17, 2) +
-        D('M27 15 L26 27 L36 24 Z') + D('M73 15 L74 27 L64 24 Z') + EYE(39, 40, 4.4) + EYE(61, 40, 4.4) + D('M46 49 L54 49 L50 53 Z') + L('M50 53 Q47 58 43 56 M50 53 Q53 58 57 56 M22 48 L34 50 M22 55 L34 54 M78 48 L66 50 M78 55 L66 54 M44 14 L44 20 M50 12 L50 19 M56 14 L56 20'); } },
-    { id: 'cachorro', nome: 'Cachorro', tags: 'cachorro cachorrinho cao cachorrao dog', fn: function () {
-      return BG + SUN(88, 12, 6) + GR(92) +
-        D('M70 86 C84 82 88 68 82 58 C80 68 76 76 68 78 Z') + D('M32 56 C26 76 28 92 40 96 L60 96 C72 92 74 76 68 56 Z') + E(50, 82, 10, 12) + E(41, 96, 8, 3.6) + E(59, 96, 8, 3.6) +
-        D('M34 56 Q50 66 66 56 L66 62 Q50 72 34 62 Z') + C(50, 69, 3) +
-        D('M30 24 C14 22 10 40 14 54 C20 58 28 50 30 40 Z') + D('M70 24 C86 22 90 40 86 54 C80 58 72 50 70 40 Z') +
-        E(50, 38, 22, 20) + D('M24 30 C30 24 38 26 40 32 C36 40 26 40 24 30 Z') + E(50, 47, 11.5, 8.6) +
-        EYE(40, 34, 4.2) + EYE(60, 34, 4.2) + E(50, 42, 4.6, 3.2) + L('M50 45 L50 49 M50 49 Q46 53 42 50 M50 49 Q54 53 58 50') + D('M47 51 Q50 59 53 51 Z'); } },
-    { id: 'coelho', nome: 'Coelho', tags: 'coelho coelhinho coelha pascoa', fn: function () {
-      return BG + STR(12, 14, 4) + STR(88, 22, 3.5) + GR(92) + D('M72 88 C88 88 90 76 82 72 C80 80 76 84 70 84 Z') + C(80, 80, 6) +
-        D('M34 62 C26 80 28 94 42 96 L58 96 C72 94 74 80 66 62 Z') + E(50, 82, 11, 12) + E(41, 96, 7, 3.6) + E(59, 96, 7, 3.6) +
-        D('M38 40 C30 22 32 6 41 4 C50 6 50 28 46 42 Z') + D('M62 40 C70 22 68 6 59 4 C50 6 50 28 54 42 Z') + D('M39 34 C35 22 36 12 41 10 C45 14 45 26 43 36 Z') + D('M61 34 C65 22 64 12 59 10 C55 14 55 26 57 36 Z') +
-        E(50, 52, 21, 17) + EYE(41, 49, 3.8) + EYE(59, 49, 3.8) + D('M46 56 L54 56 L50 60 Z') + L('M50 60 Q47 65 43 63 M50 60 Q53 65 57 63') + CHK(35, 58) + CHK(65, 58); } },
-    { id: 'elefante', nome: 'Elefante', tags: 'elefante elefantinho tromba', fn: function () {
-      return BG + SUN(88, 12, 6) + CLD(24, 14, .3) + GR(92) +
-        D('M24 70 C18 86 24 98 40 98 L60 98 C76 98 82 86 76 70 Z') +
-        D('M28 26 C8 18 2 40 8 58 C14 72 30 68 36 56 Z') + D('M72 26 C92 18 98 40 92 58 C86 72 70 68 64 56 Z') +
-        D('M30 30 C14 28 10 42 14 54 C20 60 28 56 32 48 Z') + D('M70 30 C86 28 90 42 86 54 C80 60 72 56 68 48 Z') +
-        C(50, 42, 24) + D('M40 56 C36 72 40 90 54 92 C62 92 64 84 60 82 C54 82 54 70 58 56 Z') + EYE(40, 38, 3.6) + EYE(60, 38, 3.6) + CHK(34, 50) + CHK(66, 50) +
-        D('M34 60 C26 66 26 76 32 80 C34 72 38 66 40 62 Z') + L('M42 70 L50 70 M42 78 L50 78 M44 86 L52 86'); } },
-    { id: 'passaro', nome: 'Passarinho', tags: 'passaro passarinho ave pardal bem-te-vi', fn: function () {
-      return BG + SUN(86, 14, 7) + CLD(22, 16, .3) + D('M0 78 L100 74 L100 82 L0 86 Z') + D('M8 84 C4 72 18 70 20 82 Z') + D('M86 78 C90 66 100 70 96 80 Z') +
-        D('M24 50 L6 38 C6 48 8 58 12 64 Z') + L('M42 70 L42 80 M52 70 L52 78') + E(46, 54, 25, 19, -6) + D('M30 54 C42 38 58 46 54 64 C46 70 34 66 30 54 Z') +
-        C(68, 34, 13) + D('M80 32 L94 38 L80 42 Z') + C(70, 31, 3.2) + C(71, 31, 1.5) + E(44, 62, 12, 7, -10) + CHK(72, 40); } },
-    { id: 'tartaruga', nome: 'Tartaruga', tags: 'tartaruga jabuti cagado', fn: function () {
-      return BG + SUN(86, 14, 7) + CLD(26, 16, .3) + GR(88) +
-        D('M16 66 L4 74 L18 74 Z') + D('M22 66 C20 76 20 82 24 85 L38 85 C40 80 38 72 36 66 Z') + D('M62 66 C60 72 60 80 62 85 L78 85 C80 80 78 72 76 66 Z') +
-        D('M80 56 C84 44 98 46 98 56 C98 64 90 70 82 68 Z') + C(92, 52, 2.4) + L('M90 62 Q94 62 96 58') +
-        D('M12 66 L88 66 Q88 75 78 75 L22 75 Q12 75 12 66 Z') + D('M16 66 C16 36 34 22 50 22 C66 22 84 36 84 66 Z') +
-        P('42,32 58,32 64,44 58,56 42,56 36,44') + L('M42 32 L38 24 M58 32 L62 24 M64 44 L76 44 M58 56 L64 66 M42 56 L36 66 M36 44 L24 44'); } },
-    { id: 'sol', nome: 'Sol', tags: 'sol solzinho dia ensolarado', fn: function () {
-      var s = BG + CLD(18, 18, .3) + CLD(84, 84, .3); for (var i = 0; i < 12; i++) { var a = i * Math.PI / 6; s += P(pt(50, 50, 24, a - 0.17) + ' ' + pt(50, 50, 46, a) + ' ' + pt(50, 50, 24, a + 0.17)); }
-      return s + C(50, 50, 26) + EYE(41, 46, 3.6) + EYE(59, 46, 3.6) + CHK(34, 56) + CHK(66, 56) + L('M40 57 Q50 68 60 57'); } },
-    { id: 'lua', nome: 'Lua', tags: 'lua luazinha noite crescente', fn: function () {
-      return BG + STR(16, 16, 6) + STR(84, 14, 5) + STR(88, 60, 4) + STR(14, 76, 4.5) + STR(70, 88, 4) + CLD(80, 82, .34) +
-        D('M64 8 C40 10 20 28 20 50 C20 72 40 90 64 92 C48 80 44 64 46 50 C48 34 54 20 64 8 Z') + L('M32 44 Q36 40 40 44') + CHK(30, 54) + L('M28 62 Q34 68 40 62'); } },
-    { id: 'estrela', nome: 'Estrela', tags: 'estrela estrelinha estrelas', fn: function () {
-      return BG + STR(14, 14, 7) + STR(86, 18, 6) + STR(88, 82, 7) + STR(12, 84, 5) + STR(50, 50, 40, 0.5) + EYE(42, 50, 3.6) + EYE(58, 50, 3.6) + CHK(36, 58) + CHK(64, 58) + L('M43 60 Q50 67 57 60'); } },
-    { id: 'coracao', nome: 'Coração', tags: 'coracao coracaozinho amor', fn: function () {
-      return BG + TD('M50 88 C10 58 6 30 28 22 C40 18 48 26 50 34 C52 26 60 18 72 22 C94 30 90 58 50 88 Z', .22, 4, 6) + TD('M50 88 C10 58 6 30 28 22 C40 18 48 26 50 34 C52 26 60 18 72 22 C94 30 90 58 50 88 Z', .18, 76, 70) +
-        D(HEART) + D('M24 38 C24 32 30 28 36 30 C32 32 28 36 28 44 Z') + EYE(38, 46, 3.6) + EYE(62, 46, 3.6) + CHK(32, 54) + CHK(68, 54) + L('M44 56 Q50 63 56 56'); } },
-    { id: 'nuvem', nome: 'Nuvem', tags: 'nuvem nuvens chuva ceu tempo', fn: function () {
-      return BG + D('M6 70 A44 44 0 0 1 94 70 L86 70 A36 36 0 0 0 14 70 Z') + D('M14 70 A36 36 0 0 1 86 70 L78 70 A28 28 0 0 0 22 70 Z') + D('M22 70 A28 28 0 0 1 78 70 L70 70 A20 20 0 0 0 30 70 Z') +
-        D('M22 80 C8 80 6 56 22 54 C20 36 40 28 50 40 C56 24 82 26 82 46 C98 46 98 80 80 80 Z') + EYE(40, 58, 3.4) + EYE(60, 58, 3.4) + CHK(33, 66) + CHK(67, 66) + L('M44 68 Q50 74 56 68') +
-        D('M26 86 C22 90 24 94 28 94 C32 94 32 90 26 86 Z') + D('M48 88 C44 92 46 96 50 96 C54 96 54 92 48 88 Z') + D('M72 86 C68 90 70 94 74 94 C78 94 78 90 72 86 Z'); } },
-    { id: 'barco', nome: 'Barco', tags: 'barco barquinho navio veleiro', fn: function () {
-      return BG + SUN(86, 14, 7) + CLD(24, 16, .3) + R(0, 70, 100, 30) + L('M0 76 Q8 72 16 76 T32 76 T48 76 T64 76 T80 76 T96 76') +
-        R(48, 10, 3, 52) + D('M52 14 L52 56 L80 56 C76 36 66 24 52 14 Z') + D('M46 24 L46 56 L22 56 C26 44 34 32 46 24 Z') + P('51,10 51,20 62,15') +
-        D('M10 60 L90 60 C86 76 78 84 68 84 L32 84 C22 84 14 76 10 60 Z') + L('M13 68 L87 68') + C(34, 76, 3.4) + C(50, 76, 3.4) + C(66, 76, 3.4) +
-        D('M0 88 Q12 82 24 88 T48 88 T72 88 T96 88 L100 88 L100 100 L0 100 Z'); } },
-    { id: 'aviao', nome: 'Avião', tags: 'aviao aviaozinho aeronave jato voar', fn: function () {
-      return BG + SUN(86, 14, 7) + CLD(22, 20, .34) + CLD(70, 84, .32) + CLD(24, 84, .26) +
-        D('M10 44 L4 22 L20 22 L32 42 Z') + D('M44 52 L66 84 L80 84 L70 52 Z') +
-        D('M6 52 C6 44 14 40 28 40 L80 40 C92 40 98 46 98 52 C98 58 92 62 80 62 L26 62 C12 62 6 58 6 52 Z') +
-        D('M80 40 C88 40 94 44 96 50 L80 50 Z') + C(22, 52, 3) + C(33, 52, 3) + C(44, 52, 3) + C(55, 52, 3) + C(66, 52, 3) + D('M40 60 L58 60 L56 70 L42 70 Z') + L('M8 56 L92 56'); } },
-    { id: 'trem', nome: 'Trem', tags: 'trem trenzinho locomotiva maria-fumaca trilho', fn: function () {
-      return BG + CLD(70, 14, .3) + D('M0 70 C20 60 40 70 60 62 C80 54 90 64 100 60 L100 100 L0 100 Z') +
-        C(30, 14, 6) + C(40, 8, 5) + D('M20 40 L22 26 L18 20 L36 20 L32 26 L34 40 Z') + R(12, 40, 48, 28, 5) + L('M28 40 L28 68 M44 40 L44 68') +
-        R(60, 28, 28, 40, 3) + R(56, 22, 36, 6, 2) + R(66, 34, 14, 12, 2) + C(12, 54, 3) + P('12,68 4,78 20,78 20,68') +
-        C(26, 74, 9) + C(26, 74, 3.6) + C(48, 74, 9) + C(48, 74, 3.6) + C(76, 74, 9) + C(76, 74, 3.6) + L('M26 74 L76 74') + R(0, 86, 100, 4) + L('M0 94 L100 94'); } },
-    { id: 'maca', nome: 'Maçã', tags: 'maca macas fruta', fn: function () {
-      return BG + CLD(24, 14, .3) + CLD(78, 20, .26) + E(50, 92, 36, 5) +
-        D('M50 30 C36 20 12 28 14 54 C16 76 32 90 42 90 C46 90 48 88 50 88 C52 88 54 90 58 90 C68 90 84 76 86 54 C88 28 64 20 50 30 Z') +
-        D('M48 30 Q48 16 56 8 L61 11 Q54 18 54 30 Z') + D('M56 20 Q68 8 82 14 Q74 28 56 20 Z') + D('M24 42 Q28 34 36 36 Q30 40 28 52 Z'); } },
-    { id: 'bolo', nome: 'Bolo', tags: 'bolo aniversario festa parabens vela', fn: function () {
-      return BG + L('M0 8 Q25 22 50 8 T100 8') + P('6,12 12,12 9,22') + P('22,16 28,16 25,26') + P('72,16 78,16 75,26') + P('88,12 94,12 91,22') + E(50, 90, 48, 6) +
-        D('M12 62 L88 62 L88 86 Q88 90 84 90 L16 90 Q12 90 12 86 Z') + D('M12 62 Q18 72 26 62 Q34 74 42 62 Q50 74 58 62 Q66 74 74 62 Q82 72 88 62 L88 58 Q50 50 12 58 Z') +
-        D('M22 44 L78 44 L78 62 L22 62 Z') + D('M22 44 Q30 54 38 44 Q46 54 54 44 Q62 54 70 44 Q74 50 78 44 L78 40 Q50 34 22 40 Z') +
-        R(34, 22, 5, 16, 1.5) + R(47.5, 22, 5, 16, 1.5) + R(61, 22, 5, 16, 1.5) + D('M36.5 12 C32 18 32 22 36.5 22 C41 22 41 18 36.5 12 Z') + D('M50 12 C45.5 18 45.5 22 50 22 C54.5 22 54.5 18 50 12 Z') + D('M63.5 12 C59 18 59 22 63.5 22 C68 22 68 18 63.5 12 Z') +
-        C(24, 76, 3) + C(40, 78, 3) + C(60, 78, 3) + C(76, 76, 3); } },
-    { id: 'robo', nome: 'Robô', tags: 'robo robozinho maquina', fn: function () {
-      return BG + STR(12, 16, 5) + STR(88, 12, 4) + STR(90, 56, 3.5) +
-        L('M50 12 L50 6') + C(50, 5, 3.4) + R(46, 38, 8, 8, 1) + R(12, 48, 12, 28, 5) + R(76, 48, 12, 28, 5) + C(18, 80, 6) + C(82, 80, 6) +
-        R(34, 78, 12, 14, 3) + R(54, 78, 12, 14, 3) + R(30, 90, 18, 6, 3) + R(52, 90, 18, 6, 3) + R(26, 46, 48, 34, 6) + R(38, 52, 24, 18, 3) + C(44, 61, 3) + C(56, 61, 3) + L('M40 74 L60 74') +
-        R(30, 12, 40, 28, 6) + EYE(41, 26, 5) + EYE(59, 26, 5) + R(40, 33, 20, 4, 2) + L('M45 33 L45 37 M50 33 L50 37 M55 33 L55 37') + R(26, 20, 4, 10, 2) + R(70, 20, 4, 10, 2); } },
-    { id: 'castelo', nome: 'Castelo', tags: 'castelo rei rainha princesa principe reino', fn: function () {
-      return BG + SUN(86, 12, 6) + CLD(24, 12, .28) + D('M0 88 C25 82 60 92 100 86 L100 100 L0 100 Z') +
-        R(28, 38, 44, 50) + R(28, 32, 8, 6) + R(46, 32, 8, 6) + R(64, 32, 8, 6) + R(8, 28, 22, 60, 1) + R(70, 28, 22, 60, 1) + P('5,30 19,8 33,30') + P('67,30 81,8 95,30') +
-        L('M19 8 L19 0') + P('19,0 28,3 19,6') + L('M81 8 L81 0') + P('81,0 90,3 81,6') +
-        D('M42 88 L42 68 Q50 56 58 68 L58 88 Z') + L('M50 60 L50 88 M42 74 L58 74') + D('M15 52 L15 44 Q19 38 23 44 L23 52 Z') + D('M77 52 L77 44 Q81 38 85 44 L85 52 Z') + D('M45 52 L45 46 Q50 40 55 46 L55 52 Z') +
-        R(14, 66, 10, 12, 1) + R(76, 66, 10, 12, 1); } },
-    { id: 'balao', nome: 'Balão', tags: 'balao baloes festa', fn: function () {
-      return BG + CLD(20, 86, .34) + CLD(82, 88, .3) +
-        L('M26 66 Q22 80 28 90 M74 68 Q78 80 72 92 M50 76 Q42 86 52 92 Q58 96 50 100') +
-        D('M26 66 L22 72 L30 72 Z') + D('M74 68 L70 74 L78 74 Z') + D('M50 76 L46 82 L54 82 Z') +
-        D('M24 20 C42 20 44 46 34 56 C32 60 28 62 26 66 C24 62 20 60 18 56 C8 46 8 20 24 20 Z') + D('M76 22 C94 22 94 48 84 58 C82 62 78 64 74 68 C72 64 68 62 66 58 C58 48 58 22 76 22 Z') +
-        D('M50 10 C70 10 72 40 60 52 C58 58 54 62 50 66 C46 62 42 58 40 52 C28 40 30 10 50 10 Z') + D('M42 20 C38 22 36 28 38 34 C42 30 44 24 42 20 Z'); } },
-    { id: 'dinossauro', nome: 'Dinossauro', tags: 'dinossauro dino dinossauros rex', fn: function () {
-      return BG + SUN(86, 12, 6) + D('M0 88 C25 82 60 92 100 84 L100 100 L0 100 Z') +
-        D('M22 48 L18 34 L28 40 Z') + D('M34 42 L32 26 L42 36 Z') + D('M48 40 L48 24 L58 36 Z') + D('M62 42 L66 28 L72 40 Z') +
-        D('M14 66 C8 74 4 70 2 60 C10 62 14 60 20 56 Z') + R(26, 70, 14, 20, 5) + R(58, 70, 14, 20, 5) + R(18, 72, 12, 18, 5) + R(64, 72, 12, 18, 5) +
-        D('M14 70 C12 48 34 40 56 44 C74 46 82 56 82 70 C82 76 78 78 72 78 L24 78 C18 78 14 76 14 70 Z') + E(46, 66, 20, 10) +
-        D('M70 50 C74 40 78 36 82 36 C92 32 98 42 94 52 C92 60 86 62 80 60 C76 58 74 56 70 50 Z') + EYE(88, 42, 3.2) + L('M80 56 Q88 60 94 54') + C(92, 47, 1.2) + CHK(84, 52); } },
-    { id: 'sapo', nome: 'Sapo', tags: 'sapo ra perereca', fn: function () {
-      return BG + L('M8 10 L8 50 M14 20 L14 54 M90 14 L90 52 M84 22 L84 56') + D('M2 94 C4 88 16 88 18 94 Z') + E(50, 94, 46, 6) +
-        E(18, 82, 12, 8, -20) + E(82, 82, 12, 8, 20) + E(50, 70, 32, 22) + E(50, 76, 17, 13) + E(33, 90, 9, 4.6) + E(67, 90, 9, 4.6) +
-        E(50, 50, 30, 20) + C(32, 34, 11) + C(68, 34, 11) + C(32, 35, 5) + C(68, 35, 5) + C(44, 48, 1.6) + C(56, 48, 1.6) + CHK(30, 54) + CHK(70, 54) + L('M24 56 Q50 74 76 56') + C(40, 66, 3) + C(62, 62, 3); } },
-    { id: 'leao', nome: 'Leão', tags: 'leao leaozinho juba selva rei-da-selva', fn: function () {
-      var s = BG + SUN(88, 12, 6) + GR(94), k, a;
-      for (k = 0; k < 14; k++) { a = k * 2 * Math.PI / 14; s += C((50 + 33 * Math.cos(a)).toFixed(1), (50 + 33 * Math.sin(a)).toFixed(1), 12); }
-      return s + C(50, 50, 33) + C(29, 29, 8) + C(71, 29, 8) + C(29, 29, 4) + C(71, 29, 4) + C(50, 54, 26) + EYE(40, 46, 3.8) + EYE(60, 46, 3.8) + E(50, 64, 14, 10) + D('M44 54 L56 54 L50 61 Z') + L('M50 61 L50 66 M50 66 Q44 72 38 68 M50 66 Q56 72 62 68') + CHK(32, 58) + CHK(68, 58); } },
-    { id: 'cavalo', nome: 'Cavalo', tags: 'cavalo cavalinho egua pangare pony potro', fn: function () {
-      return BG + SUN(88, 12, 6) + CLD(16, 14, .28) + GR(94) + D('M34 62 L24 98 L76 98 L66 62 Z') +
-        D('M32 22 C14 36 16 68 30 82 L38 60 C32 48 32 36 38 26 Z') + D('M68 22 C86 36 84 68 70 82 L62 60 C68 48 68 36 62 26 Z') +
-        P('34,28 30,6 46,18') + P('66,28 70,6 54,18') + P('36,24 34,12 43,19') + P('64,24 66,12 57,19') +
-        D('M50 10 C64 10 70 24 68 40 C67 54 64 66 62 74 C62 84 56 88 50 88 C44 88 38 84 38 74 C36 66 33 54 32 40 C30 24 36 10 50 10 Z') +
-        D('M47 20 L53 20 L52 58 L48 58 Z') + D('M38 14 C48 4 60 8 62 18 C54 22 46 22 38 14 Z') + E(50, 76, 11, 9) + C(45, 77, 1.8) + C(55, 77, 1.8) + EYE(40, 42, 3.6) + EYE(60, 42, 3.6) + L('M45 84 Q50 87 55 84'); } },
-    { id: 'vaca', nome: 'Vaca', tags: 'vaca vaquinha boi touro leite fazenda', fn: function () {
-      return BG + SUN(88, 12, 6) + GR(92) + D('M28 24 C22 12 28 6 34 10 L38 22 Z') + D('M72 24 C78 12 72 6 66 10 L62 22 Z') +
-        E(16, 40, 11, 6.5, 20) + E(84, 40, 11, 6.5, -20) + E(50, 50, 27, 31) + D('M26 34 C30 22 44 24 44 34 C42 46 30 46 26 34 Z') + D('M72 30 C80 32 80 44 72 48 C66 44 66 34 72 30 Z') +
-        E(50, 74, 18, 14) + EYE(39, 46, 3.8) + EYE(61, 46, 3.8) + E(42, 74, 2.4, 3.4) + E(58, 74, 2.4, 3.4) + L('M44 86 Q50 90 56 86') + D('M34 84 Q50 98 66 84 L66 90 Q50 104 34 90 Z') + C(50, 96, 3); } },
-    { id: 'porco', nome: 'Porquinho', tags: 'porco porquinho porca leitao fazenda', fn: function () {
-      return BG + SUN(88, 12, 6) + CLD(18, 14, .28) + E(50, 94, 44, 6) +
-        D('M24 30 C18 20 22 10 30 12 C38 14 42 20 42 24 Z') + D('M76 30 C82 20 78 10 70 12 C62 14 58 20 58 24 Z') + D('M24 70 C26 84 36 92 50 92 C64 92 74 84 76 70 Z') +
-        C(50, 52, 32) + E(50, 62, 15, 11) + E(44, 62, 2.6, 4) + E(56, 62, 2.6, 4) + EYE(36, 46, 4) + EYE(64, 46, 4) + CHK(28, 60) + CHK(72, 60) + L('M42 74 Q50 78 58 74'); } },
-    { id: 'pato', nome: 'Pato', tags: 'pato patinho marreco lago', fn: function () {
-      return BG + SUN(86, 14, 7) + CLD(24, 16, .3) + P('20,58 4,40 30,52') + D('M58 52 C58 42 60 36 62 30 L82 32 C80 42 80 48 84 56 Z') +
-        E(46, 66, 32, 20) + C(70, 30, 15) + D('M82 28 L98 33 L82 38 Z') + C(72, 27, 3.2) + C(73, 27, 1.5) + CHK(76, 38) + E(42, 66, 17, 10, -12) + L('M30 66 Q42 72 54 66') +
-        D('M0 82 Q12 76 25 82 T50 82 T75 82 T100 82 L100 100 L0 100 Z'); } },
-    { id: 'macaco', nome: 'Macaco', tags: 'macaco macaquinho chimpanze primata banana', fn: function () {
-      return BG + SUN(88, 12, 6) + CLD(20, 14, .28) + D('M72 92 C92 94 98 74 88 62 C86 70 84 80 70 84 Z') +
-        D('M30 66 C22 82 26 96 40 98 L60 98 C74 96 78 82 70 66 Z') + E(50, 84, 12, 12) + C(16, 44, 10) + C(84, 44, 10) + C(16, 44, 5) + C(84, 44, 5) +
-        C(50, 42, 28) + D('M50 40 C44 28 26 32 26 48 C26 64 40 72 50 72 C60 72 74 64 74 48 C74 32 56 28 50 40 Z') + EYE(41, 44, 4) + EYE(59, 44, 4) + E(50, 58, 10, 6.5) + C(46, 56, 1.5) + C(54, 56, 1.5) + L('M42 62 Q50 68 58 62'); } },
-    { id: 'girafa', nome: 'Girafa', tags: 'girafa girafinha pescoco savana', fn: function () {
-      return BG + SUN(88, 12, 6) + CLD(60, 16, .28) + GR(94) +
-        R(32, 74, 9, 24, 3) + R(44, 74, 9, 24, 3) + R(60, 74, 9, 24, 3) + R(72, 74, 9, 24, 3) + D('M80 66 C92 68 94 80 90 88 L86 86 C88 78 86 72 80 70 Z') +
-        D('M30 26 L50 26 L58 66 L34 70 Z') + E(56, 70, 28, 15) + C(40, 38, 4) + C(46, 52, 4) + C(60, 66, 4.4) + C(72, 72, 3.6) + C(48, 74, 3.6) +
-        R(38, 4, 3.2, 10, 1) + R(46, 4, 3.2, 10, 1) + C(39.6, 3, 2.8) + C(47.6, 3, 2.8) + E(52, 14, 6, 3, 25) +
-        E(36, 20, 15, 10, -8) + E(24, 23, 8.5, 6.5) + C(20, 23, 1.2) + EYE(34, 17, 3); } },
-    { id: 'abelha', nome: 'Abelha', tags: 'abelha abelhinha inseto mel zangao', fn: function () {
-      return BG + SUN(88, 12, 6) + CLD(18, 14, .28) + GR(92) + L('M14 96 L14 84 M86 96 L86 82') + C(14, 80, 4) + C(86, 78, 4) +
-        E(40, 30, 13, 19, -25) + E(62, 26, 13, 19, 25) + P('22,60 8,64 22,68') + E(50, 60, 28, 21) + E(40, 60, 5, 19) + E(54, 60, 5, 20) + E(66, 58, 4, 16) +
-        L('M72 44 Q76 34 82 30 M84 46 Q90 38 96 38') + C(82, 30, 1.8) + C(96, 38, 1.8) + C(82, 58, 13) + EYE(86, 54, 3.4) + CHK(80, 64) + L('M80 66 Q86 70 90 64'); } },
-    { id: 'tubarao', nome: 'Tubarão', tags: 'tubarao tubaraozinho mar oceano peixe', fn: function () {
-      return BG + L('M0 10 Q8 6 16 10 T32 10 T48 10 T64 10 T80 10 T96 10') + D('M0 92 C24 86 60 96 100 90 L100 100 L0 100 Z') +
-        D('M86 56 L98 34 L94 56 L100 80 Z') + D('M44 40 L52 12 L66 40 Z') + D('M6 58 C10 40 30 34 50 36 C70 38 86 48 94 58 C80 64 66 68 48 68 C28 70 12 66 6 58 Z') +
-        D('M10 60 C28 66 60 68 90 60 C70 74 30 76 10 60 Z') + D('M44 66 L38 84 L60 68 Z') + C(22, 50, 3.2) + C(23, 50, 1.4) + L('M32 44 Q36 52 32 58 M38 44 Q42 52 38 58 M10 62 L16 60 L20 63 L26 61 L30 64') + C(14, 80, 2.4) + C(22, 74, 1.8); } },
-    { id: 'onibus', nome: 'Ônibus', tags: 'onibus busao escolar transporte', fn: function () {
-      return BG + SUN(86, 14, 7) + CLD(26, 16, .32) + R(0, 80, 100, 20) + L('M6 91 L22 91 M34 91 L50 91 M62 91 L78 91 M90 91 L100 91') +
-        R(6, 28, 88, 46, 7) + R(12, 34, 16, 16, 2) + R(32, 34, 16, 16, 2) + R(52, 34, 16, 16, 2) + R(72, 34, 16, 16, 2) + R(6, 56, 88, 6, 0) +
-        C(88, 66, 3) + R(4, 62, 6, 6, 1.5) + C(26, 76, 9) + C(26, 76, 3.8) + C(74, 76, 9) + C(74, 76, 3.8) + R(88, 50, 4, 7, 1); } },
-    { id: 'bicicleta', nome: 'Bicicleta', tags: 'bicicleta bike bici pedal', fn: function () {
-      return BG + SUN(86, 14, 7) + CLD(26, 16, .32) + GR(90) +
-        C(24, 66, 20) + C(24, 66, 15) + C(76, 66, 20) + C(76, 66, 15) + L('M24 46 L24 86 M4 66 L44 66 M10 52 L38 80 M38 52 L10 80 M76 46 L76 86 M56 66 L96 66 M62 52 L90 80 M90 52 L62 80') +
-        LEG([[24, 66], [44, 66], [58, 40], [76, 66]], 2.6) + LEG([[44, 66], [36, 40], [58, 40]], 2.6) + LEG([[58, 40], [66, 36], [72, 40]], 2.6) + LEG([[36, 40], [30, 36], [42, 36]], 3.4) + C(44, 66, 4) + R(40, 66, 8, 3, 1) + D('M20 42 L36 42 L36 36 L20 36 Z'); } },
-    { id: 'helicoptero', nome: 'Helicóptero', tags: 'helicoptero helicopteros voar helice', fn: function () {
-      return BG + SUN(86, 12, 6) + CLD(22, 84, .34) + CLD(80, 84, .28) +
-        R(8, 20, 84, 4, 2) + R(47, 24, 6, 10, 1) + D('M64 48 L94 40 L94 52 L66 58 Z') + P('90,40 98,32 98,44') + C(94, 46, 4) +
-        E(44, 52, 28, 18) + D('M20 48 C24 40 34 38 42 40 L42 56 L20 56 Z') + L('M20 56 L68 56') + L('M24 74 L72 74 M34 68 L34 74 M58 68 L58 74') + R(24, 74, 48, 3, 1.5) + C(70, 52, 2); } },
-    { id: 'pizza', nome: 'Pizza', tags: 'pizza fatia calabresa comida lanche', fn: function () {
-      return BG + E(50, 94, 40, 4) + D('M50 94 L8 26 Q50 6 92 26 Z') + D('M6 24 Q50 2 94 24 L92 34 Q50 14 8 34 Z') +
-        D('M12 38 Q50 20 88 38 L82 48 Q70 44 62 52 Q58 44 50 50 Q40 44 30 52 Q22 44 18 48 Z') + C(38, 52, 6.5) + C(60, 48, 6.5) + C(48, 68, 6.5) + C(52, 84, 4) + C(30, 40, 3) + C(66, 38, 3) + C(40, 28, 2.4) + C(58, 24, 2.4); } },
-    { id: 'banana', nome: 'Banana', tags: 'banana bananinha fruta macaco', fn: function () {
-      return BG + CLD(22, 14, .3) + CLD(80, 22, .26) + E(50, 92, 44, 5) +
-        D('M14 22 C12 60 40 90 90 78 L92 68 C56 72 36 52 30 20 Z') + D('M14 22 L30 20 L32 10 L16 12 Z') + D('M90 78 L92 68 L97 70 L95 80 Z') + L('M22 24 C24 54 46 76 84 74'); } },
-    { id: 'uva', nome: 'Uva', tags: 'uva uvas fruta vinho cacho', fn: function () {
-      return BG + CLD(20, 14, .3) + CLD(80, 20, .26) + R(48, 6, 5, 16, 2) + D('M52 14 C60 4 76 6 80 14 C72 24 58 22 52 14 Z') + L('M52 14 Q66 14 80 14') + D('M50 14 C42 6 28 8 24 16 C32 26 44 24 50 14 Z') +
-        C(26, 34, 9) + C(44, 34, 9) + C(62, 34, 9) + C(80, 34, 9) + C(35, 50, 9) + C(53, 50, 9) + C(71, 50, 9) + C(44, 66, 9) + C(62, 66, 9) + C(53, 82, 9); } },
-    { id: 'morango', nome: 'Morango', tags: 'morango morangos fruta vermelha', fn: function () {
-      return BG + CLD(22, 14, .3) + CLD(80, 22, .26) + E(50, 94, 34, 4) +
-        D('M50 94 C16 70 6 46 14 34 C22 24 40 28 50 32 C60 28 78 24 86 34 C94 46 84 70 50 94 Z') + D('M50 34 L34 20 L42 30 L26 28 L42 36 Z') + D('M50 34 L66 20 L58 30 L74 28 L58 36 Z') + D('M50 34 L42 12 L50 26 L58 12 Z') +
-        E(34, 48, 2.4, 3.6) + E(50, 46, 2.4, 3.6) + E(66, 48, 2.4, 3.6) + E(28, 62, 2.4, 3.6) + E(42, 62, 2.4, 3.6) + E(58, 62, 2.4, 3.6) + E(72, 62, 2.4, 3.6) + E(36, 76, 2.4, 3.6) + E(50, 76, 2.4, 3.6) + E(64, 76, 2.4, 3.6) + E(50, 88, 2.4, 3.2); } },
-    { id: 'cenoura', nome: 'Cenoura', tags: 'cenoura cenouras legume coelho horta', fn: function () {
-      return BG + SUN(86, 12, 6) + D('M0 88 C25 82 60 92 100 86 L100 100 L0 100 Z') + L('M10 94 L22 94 M60 96 L74 96') +
-        D('M50 38 C40 24 34 10 38 4 C44 6 50 20 50 38 Z') + D('M50 38 C50 20 54 6 62 4 C66 10 60 24 50 38 Z') + D('M50 38 C46 26 42 18 30 14 C28 22 38 32 50 38 Z') + D('M50 38 C54 28 60 22 70 18 C72 26 62 34 50 38 Z') +
-        D('M32 36 C32 30 68 30 68 36 C66 56 56 80 50 96 C44 80 34 56 32 36 Z') + L('M38 46 L46 46 M54 58 L62 58 M42 66 L48 66 M54 76 L58 76'); } },
-    { id: 'bola', nome: 'Bola', tags: 'bola bolinha futebol esporte jogo', fn: function () {
-      return BG + SUN(86, 12, 6) + CLD(20, 14, .28) + GR(88) + E(50, 92, 28, 4) +
-        C(50, 50, 38) + P('50,34 64,44 59,60 41,60 36,44') + P('50,34 50,12 62,16 64,44') + P('50,34 50,12 38,16 36,44') + P('36,44 14,40 14,58 41,60') + P('64,44 86,40 86,58 59,60') + P('41,60 36,78 50,86 62,78 59,60'); } },
-    { id: 'guardachuva', nome: 'Guarda-chuva', tags: 'guarda-chuva guardachuva chuva sombrinha', fn: function () {
-      return BG + CLD(22, 12, .3) + CLD(78, 10, .3) + L('M12 20 L10 28 M26 30 L24 38 M80 24 L78 32 M92 34 L90 42 M6 40 L4 48 M70 38 L68 46') +
-        E(50, 94, 40, 5) + D('M52 50 L52 80 C52 90 40 90 40 82 L43 82 C43 86 49 86 49 80 L49 50 Z') +
-        D('M8 52 C8 30 26 12 50 12 C74 12 92 30 92 52 C84 44 76 44 70 52 C62 44 56 44 50 52 L50 12 Z') + D('M50 12 C74 12 92 30 92 52 C84 44 76 44 70 52 C64 44 58 44 50 52 Z') +
-        D('M50 12 C38 20 32 36 30 52 C24 44 16 44 8 52 C8 30 26 12 50 12 Z') + D('M50 12 C44 24 40 40 40 52 C36 46 34 46 30 52 C32 36 38 20 50 12 Z'); } },
-    { id: 'heroi', nome: 'Super-herói', tags: 'heroi superheroi super-heroi super capa mascara poderes forte', fn: function () {
-      return BG + STR(12, 16, 5) + STR(88, 14, 4) + CLD(80, 80, .34) + CLD(18, 84, .3) +
-        D('M34 34 C20 56 14 76 10 94 L50 84 L90 94 C86 76 80 56 66 34 Z') + R(35, 78, 12, 16, 3) + R(53, 78, 12, 16, 3) + R(33, 90, 16, 6, 3) + R(51, 90, 16, 6, 3) +
-        D('M36 36 L64 36 L60 62 L40 62 Z') + R(32, 60, 36, 7, 2) + D('M40 67 L60 67 L56 80 L44 80 Z') +
-        R(10, 40, 24, 9, 4) + R(66, 40, 24, 9, 4) + C(10, 44, 6) + C(90, 44, 6) + STR(50, 50, 8, .5) +
-        R(44, 28, 12, 9, 2) + C(50, 20, 13) + D('M37 16 C40 6 60 6 63 16 C54 12 46 12 37 16 Z') + D('M37 19 L63 19 L61 25 Q50 22 39 25 Z') + C(44, 21, 2) + C(56, 21, 2) + L('M44 29 Q50 33 56 29'); } },
-    { id: 'aranha', nome: 'Aranha', tags: 'aranha aranhas teia inseto', fn: function () {
-      var s = BG + L('M50 0 L50 36 M0 6 L24 20 M100 6 L76 20 M0 0 L10 16 M100 0 L90 16') + L('M14 10 Q22 16 30 12 M86 10 Q78 16 70 12');
-      var legs = [[[42, 56], [24, 40], [10, 52], [6, 70]], [[40, 62], [18, 62], [8, 76], [8, 92]], [[42, 68], [24, 82], [18, 94], [22, 98]], [[44, 52], [34, 30], [20, 24], [12, 30]],
-        [[58, 56], [76, 40], [90, 52], [94, 70]], [[60, 62], [82, 62], [92, 76], [92, 92]], [[58, 68], [76, 82], [82, 94], [78, 98]], [[56, 52], [66, 30], [80, 24], [88, 30]]];
-      legs.forEach(function (l) { s += LEG(l, 3); });
-      return s + E(50, 68, 17, 21) + C(50, 46, 12) + EYE(45, 44, 3.6) + EYE(55, 44, 3.6) + L('M45 52 Q50 56 55 52') + C(46, 64, 3) + C(54, 64, 3) + C(50, 76, 3); } },
-    { id: 'livre', nome: 'Em branco', tags: 'branco livre vazio folha desenho-livre', fn: function () { return BG; } }
-  ];
-  var DRAWMAP = {}; DRAW.forEach(function (d) { DRAWMAP[d.id] = d; });
-
-  function norm(s) { return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z\s-]/g, ' ').replace(/\s+/g, ' ').trim(); }
-  var STOP = { um: 1, uma: 1, o: 1, a: 1, os: 1, as: 1, de: 1, do: 1, da: 1, dos: 1, das: 1, desenho: 1, quero: 1, pintar: 1, com: 1, e: 1, para: 1, meu: 1, minha: 1 };
-  function lev(a, b) {
-    var m = a.length, n = b.length, i, j, prev, cur;
-    if (Math.abs(m - n) > 2) return 9;
-    prev = []; for (j = 0; j <= n; j++) prev.push(j);
-    for (i = 1; i <= m; i++) {
-      cur = [i];
-      for (j = 1; j <= n; j++) cur.push(Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1)));
-      prev = cur;
-    }
-    return prev[n];
-  }
-  function stems(t) {
-    var v = [t], x = t;
-    x = x.replace(/oes$/, 'ao').replace(/aes$/, 'ao').replace(/ois$/, 'ol').replace(/(ns)$/, 'm').replace(/(res|zes|ses)$/, function (m) { return m.slice(0, -2); }).replace(/s$/, '');
-    v.push(x);
-    var y = x.replace(/(z?inh[oa]s?|z?it[oa]s?|ao)$/, '');
-    if (y.length >= 3) { v.push(y); v.push(y + 'o'); v.push(y + 'a'); }
-    return v.filter(function (e, i) { return e.length >= 3 && v.indexOf(e) === i; });
-  }
-  function searchDraw(q) {
-    var tokens = norm(q).split(' ').filter(function (t) { return t.length > 1 && !STOP[t]; });
-    if (!tokens.length) return DRAW.slice();
-    var out = [];
-    DRAW.forEach(function (d) {
-      var tags = norm(d.tags + ' ' + d.nome).split(' '), s = 0;
-      tokens.forEach(function (t) {
-        var best = 0;
-        stems(t).forEach(function (v, vi) {
-          tags.forEach(function (g) {
-            var sc = 0;
-            if (g === v) sc = vi === 0 ? 10 : 8;
-            else if (g.length >= 3 && v.length >= 3 && g.indexOf(v) === 0 && g.length - v.length <= 3) sc = 5;
-            else if (v.length >= 4 && g.length >= 4 && v.indexOf(g) === 0 && v.length - g.length <= 3) sc = 5;
-            else if (v.length >= 5 && g.length >= 5 && lev(v, g) <= (v.length >= 7 ? 2 : 1)) sc = 4;
-            if (sc > best) best = sc;
-          });
-        });
-        s += best;
-      });
-      if (s > 0) out.push({ d: d, s: s });
-    });
-    out.sort(function (a, b) { return b.s - a.s; });
-    if (out.length) { var top = out[0].s; out = out.filter(function (x) { return x.s > top * 0.5; }); }
-    return out.map(function (x) { return x.d; });
-  }
-
-  /* ---------- PINTAR (preencher ou pincel) ---------- */
-  var PAINT = ['#ef4444', '#f97316', '#facc15', '#84cc16', '#16a34a', '#14b8a6', '#38bdf8', '#2563eb', '#a855f7', '#ec4899', '#92400e', '#1f2937', '#ffffff'];
-  var PAINT_NAMES = ['vermelho', 'laranja', 'amarelo', 'verde limão', 'verde', 'turquesa', 'azul claro', 'azul', 'roxo', 'rosa', 'marrom', 'preto', 'branco'];
-  var BRUSH = [0.022, 0.06];
-  function pintar(area, o, mode, api) {
-    var d = DRAWMAP[o.subject] || DRAWMAP.casa, art = d.fn();
-    area.innerHTML = '<div class="stage"><div class="square"><div class="paintwrap">' +
-      '<svg class="paint base" viewBox="0 0 100 100" role="img" aria-label="Desenho: ' + d.nome + '">' + art + '</svg>' +
-      '<canvas class="brush"></canvas>' +
-      '<svg class="paint lines" viewBox="0 0 100 100" aria-hidden="true">' + art + '</svg></div></div></div>' +
-      '<div class="tools"><button class="tbtn" id="mFill" type="button">Preencher</button><button class="tbtn" id="mBrush" type="button">Pincel</button>' +
-      '<button class="tbtn" id="sizeBtn" type="button">Grosso</button><button class="tbtn" id="undoBtn" type="button">Desfazer</button><button class="tbtn" id="clrBtn" type="button">Limpar</button></div>' +
-      '<div class="palette"></div>';
-    var wrap = area.querySelector('.paintwrap'), svg = area.querySelector('svg.base'), cv = area.querySelector('canvas'), cx = cv.getContext('2d');
-    var tools = area.querySelector('.tools'), pal = area.querySelector('.palette');
-    var how = o.how === 'brush' ? 'brush' : 'fill', color = PAINT[0], size = 1, strokes = [], hist = [], cur = null, sws = [];
-
-    function setHow(h) {
-      how = h; wrap.classList.toggle('m-brush', h === 'brush'); wrap.classList.toggle('m-fill', h === 'fill'); tools.classList.toggle('t-fill', h === 'fill');
-      $('mFill').setAttribute('aria-pressed', String(h === 'fill')); $('mBrush').setAttribute('aria-pressed', String(h === 'brush'));
-    }
-    function setSize(i) { size = i; $('sizeBtn').textContent = i ? 'Grosso' : 'Fino'; }
-    function fit() {
-      var r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1, w = Math.max(1, Math.round(r.width * dpr));
-      if (r.width && (cv.width !== w || cv.height !== w)) { cv.width = w; cv.height = w; redraw(); }
-    }
-    function strokePath(s) {
-      var W = cv.width; cx.save(); cx.globalCompositeOperation = s.color ? 'source-over' : 'destination-out';
-      cx.strokeStyle = cx.fillStyle = s.color || '#000'; cx.lineCap = cx.lineJoin = 'round'; cx.lineWidth = s.size * W;
-      if (s.pts.length === 1) { cx.beginPath(); cx.arc(s.pts[0][0] * W, s.pts[0][1] * W, s.size * W / 2, 0, 6.2832); cx.fill(); }
-      else { cx.beginPath(); cx.moveTo(s.pts[0][0] * W, s.pts[0][1] * W); for (var i = 1; i < s.pts.length; i++) cx.lineTo(s.pts[i][0] * W, s.pts[i][1] * W); cx.stroke(); }
-      cx.restore();
-    }
-    function redraw() { cx.clearRect(0, 0, cv.width, cv.height); strokes.forEach(strokePath); }
-    function xy(e) { var r = cv.getBoundingClientRect(); return [Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (e.clientY - r.top) / r.height))]; }
-    cv.addEventListener('pointerdown', function (e) {
-      if (how !== 'brush') return; e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (_) {}
-      cur = { color: color, size: BRUSH[size], pts: [xy(e)] }; strokes.push(cur); strokePath(cur);
-    });
-    cv.addEventListener('pointermove', function (e) {
-      if (!cur) return; var p = xy(e), last = cur.pts[cur.pts.length - 1];
-      if (Math.abs(p[0] - last[0]) + Math.abs(p[1] - last[1]) < 0.002) return;
-      cur.pts.push(p); strokePath({ color: cur.color, size: cur.size, pts: [last, p] });
-    });
-    function endStroke() { if (cur) { hist.push({ t: 's', s: cur }); cur = null; } }
-    cv.addEventListener('pointerup', endStroke); cv.addEventListener('pointercancel', endStroke);
-
-    svg.addEventListener('click', function (e) {
-      if (how !== 'fill') return;
-      var r = e.target.closest ? e.target.closest('.reg') : null; if (!r) return;
-      hist.push({ t: 'f', el: r, prev: r.style.fill }); r.style.fill = color; beep(400 + rand(300), 0.08, 'triangle');
-    });
-    $('mFill').addEventListener('click', function () { setHow('fill'); });
-    $('mBrush').addEventListener('click', function () { setHow('brush'); });
-    $('sizeBtn').addEventListener('click', function () { setSize(size ? 0 : 1); });
-    $('undoBtn').addEventListener('click', function () {
-      var h = hist.pop(); if (!h) return;
-      if (h.t === 'f') h.el.style.fill = h.prev; else { strokes.splice(strokes.indexOf(h.s), 1); redraw(); }
-    });
-    $('clrBtn').addEventListener('click', function () {
-      svg.querySelectorAll('.reg').forEach(function (r) { r.style.fill = ''; }); strokes = []; hist = []; redraw();
-    });
-    PAINT.concat(['erase']).forEach(function (c, i) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.setAttribute('aria-label', c === 'erase' ? 'Borracha' : PAINT_NAMES[i]);
-      b.style.background = c === 'erase' ? 'var(--paper)' : c; if (c === 'erase') b.textContent = 'Apagar';
-      b.setAttribute('aria-pressed', String(i === 0));
-      b.addEventListener('click', function () {
-        color = c === 'erase' ? '' : c; sws.forEach(function (s) { s.setAttribute('aria-pressed', String(s === b)); });
-        speak(c === 'erase' ? 'borracha' : PAINT_NAMES[i]);
-      });
-      pal.appendChild(b); sws.push(b);
-    });
-    setHow(how); setSize(1);
-    var ro = window.ResizeObserver ? new ResizeObserver(fit) : null; if (ro) ro.observe(wrap);
-    window.addEventListener('resize', fit);
-    api.onStop(function () { if (ro) ro.disconnect(); window.removeEventListener('resize', fit); });
-    requestAnimationFrame(fit);
-  }
-  /* busca e escolha do desenho (menu do jogo Pintar) */
-  function paintPicker(box, g) {
-    box.innerHTML = '<div class="label">O que você quer pintar?</div>' +
-      '<div class="searchrow"><input class="inp" id="paintQ" type="text" placeholder="Digite: gato, carro, sol…" autocomplete="off" autocapitalize="none" enterkeyhint="search" aria-label="O que pintar"><button class="small-btn" id="micBtn" type="button">Falar</button><button class="small-btn" id="luckBtn" type="button">Surpresa</button></div>' +
-      '<div class="hint" id="paintHint"></div><div class="thumbs" id="thumbs"></div>';
-    var inp = $('paintQ'), hint = $('paintHint'), thumbs = $('thumbs'), mic = $('micBtn');
-    function markSel() { thumbs.querySelectorAll('.thumb').forEach(function (t) { t.setAttribute('aria-pressed', String(t.dataset.id === g.subject)); }); }
-    function renderThumbs(list) {
-      thumbs.innerHTML = '';
-      list.forEach(function (d) {
-        var b = document.createElement('button'); b.type = 'button'; b.className = 'thumb'; b.dataset.id = d.id;
-        b.innerHTML = '<svg class="paint" viewBox="0 0 100 100" aria-hidden="true">' + d.fn() + '</svg><span>' + d.nome + '</span>';
-        b.addEventListener('click', function () { g.subject = d.id; markSel(); speak(d.nome); });
-        thumbs.appendChild(b);
-      });
-      markSel();
-    }
-    function filter() {
-      var q = inp.value.trim(), res = q ? searchDraw(q) : DRAW.slice();
-      if (!q) { hint.textContent = DRAW.length + ' desenhos. Digite ou fale para procurar.'; renderThumbs(DRAW); return; }
-      if (!res.length) { hint.textContent = 'Ainda não tenho “' + q + '”. Escolha um destes:'; renderThumbs(DRAW); return; }
-      hint.textContent = res.length === 1 ? 'Achei 1 desenho.' : 'Achei ' + res.length + ' desenhos.';
-      g.subject = res[0].id; renderThumbs(res);
-    }
-    inp.addEventListener('input', filter);
-    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') inp.blur(); });
-    $('luckBtn').addEventListener('click', function () {
-      var d = pick(DRAW.filter(function (x) { return x.id !== 'livre'; })); inp.value = ''; filter(); g.subject = d.id; markSel(); speak(d.nome);
-      var t = thumbs.querySelector('[data-id="' + d.id + '"]'); if (t && t.scrollIntoView) t.scrollIntoView({ block: 'nearest' });
-    });
-    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) mic.hidden = true;
-    else mic.addEventListener('click', function () {
-      try {
-        stopSpeech(); var r = new SR(); r.lang = 'pt-BR'; r.interimResults = false; r.maxAlternatives = 1; mic.textContent = 'Ouvindo…';
-        r.onresult = function (e) { inp.value = e.results[0][0].transcript; filter(); };
-        r.onerror = function () { hint.textContent = 'Não consegui ouvir. Tente digitar.'; };
-        r.onend = function () { mic.textContent = 'Falar'; };
-        r.start();
-      } catch (_) { mic.textContent = 'Falar'; }
-    });
-    filter();
-  }
 
   /* ---------- CONTAR (até 30) ---------- */
   var COISAS = [['🍎', 'maçã', 'maçãs', true], ['🐟', 'peixe', 'peixes', false], ['⭐', 'estrela', 'estrelas', true], ['🚗', 'carro', 'carros', false],
@@ -1769,52 +1240,6 @@ canvas.brush { touch-action: none; }
     start();
   }
 
-  /* ---------- QUEBRA-CABEÇA (4 a 20 peças) ---------- */
-  var PZ = { 4: [2, 2], 6: [3, 2], 9: [3, 3], 12: [4, 3], 16: [4, 4], 20: [5, 4] };
-  var PZ_PAL = ['#ef4444', '#f97316', '#facc15', '#84cc16', '#16a34a', '#14b8a6', '#38bdf8', '#2563eb', '#a855f7', '#ec4899', '#c2763d', '#94a3b8'];
-  function pzDeco() {
-    var d = '', b, k;
-    for (b = 0; b < 10; b++) d += '<rect x="0" y="' + b * 10 + '" width="100" height="10" fill="hsl(' + (205 - b * 18) + ',80%,84%)"/>';
-    for (k = 0; k < 9; k++) d += '<circle cx="' + (50 + 46 * Math.sin(k * 2.4 + 1)).toFixed(1) + '" cy="' + (50 + 46 * Math.cos(k * 1.7)).toFixed(1) + '" r="' + (5 + (k % 3) * 3) + '" fill="' + PZ_PAL[(k * 7) % PZ_PAL.length] + '" opacity=".6"/>';
-    return d;
-  }
-  function colorize(art) { var i = 0; art = art.replace('/>', '/>' + pzDeco()); return art.replace(/class="reg"/g, function () { var c = i === 0 ? '#cfeaff' : PZ_PAL[(i * 5) % PZ_PAL.length]; i++; return 'class="reg" style="fill:' + c + '"'; }); }
-  function quebra(area, o, mode, api) {
-    var cr = PZ[o.n], cols = cr[0], rows = cr[1], n = cols * rows;
-    var d = pick(DRAW.filter(function (x) { return x.id !== 'livre'; })), art = colorize(d.fn());
-    area.innerHTML = '<div class="status small" aria-live="polite"></div><div class="stage"><div class="square"><div class="pzboard"></div><div class="pzhint" hidden><svg class="paint" viewBox="0 0 100 100" aria-hidden="true">' + art + '</svg></div></div></div>' +
-      '<div class="bottom"><div class="two"><button class="big" id="pzHint" type="button">Ver a figura</button><button class="big primary" id="pzNew" type="button">Outro</button></div></div>';
-    var board = area.querySelector('.pzboard'), hint = area.querySelector('.pzhint'), statusEl = area.querySelector('.status');
-    board.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(0, 1fr))'; board.style.gridTemplateRows = 'repeat(' + rows + ', minmax(0, 1fr))';
-    function piece(id) {
-      var c = id % cols, r = Math.floor(id / cols);
-      return '<svg class="paint pz" viewBox="' + (c * 100 / cols) + ' ' + (r * 100 / rows) + ' ' + (100 / cols) + ' ' + (100 / rows) + '" preserveAspectRatio="none" aria-hidden="true">' + art + '</svg>';
-    }
-    var arr = [], i; for (i = 0; i < n; i++) arr.push(i);
-    do { arr = shuffle(arr); } while (arr.every(function (v, k) { return v === k; }));
-    var locked = [], cells = [], sel = -1, over = false;
-    function put(k) { cells[k].innerHTML = piece(arr[k]); cells[k].classList.toggle('ok', !!locked[k]); cells[k].classList.toggle('sel', sel === k); }
-    function progress() { var m = locked.filter(Boolean).length; if (!over) statusEl.textContent = 'Peças no lugar: ' + m + ' de ' + n; return m; }
-    for (i = 0; i < n; i++) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'pzcell'; b.setAttribute('aria-label', 'peça ' + (i + 1));
-      b.addEventListener('click', (function (k) { return function () { tap(k); }; })(i));
-      board.appendChild(b); cells.push(b); locked.push(arr[i] === i);
-    }
-    function tap(k) {
-      if (over || locked[k]) return;
-      if (sel < 0) { sel = k; put(k); beep(500, 0.06, 'triangle'); return; }
-      if (sel === k) { sel = -1; put(k); return; }
-      var a = sel, t = arr[a]; arr[a] = arr[k]; arr[k] = t; sel = -1;
-      locked[a] = arr[a] === a; locked[k] = arr[k] === k; put(a); put(k); beep(locked[a] || locked[k] ? 700 : 420, 0.1, 'triangle');
-      if (progress() === n) { over = true; statusEl.textContent = 'Parabéns! Você montou tudo!'; speak('Parabéns! Você montou o quebra-cabeça!'); sfxWin(); confetti(); }
-    }
-    for (i = 0; i < n; i++) put(i);
-    progress();
-    $('pzHint').addEventListener('click', function () { hint.hidden = false; later(function () { hint.hidden = true; }, 2500); });
-    $('pzNew').addEventListener('click', api.restart);
-    speak('Toque em duas peças para trocar de lugar');
-  }
-
   /* ---------- campo em canvas (sinuca e futebol) ---------- */
   function hyp(a, b) { return Math.sqrt(a * a + b * b); }
   function rrect(cx, x, y, w, h, r) {
@@ -2118,15 +1543,6 @@ canvas.brush { touch-action: none; }
       groups: [{ key: 'pairs', label: 'Quantos pares', options: [{ label: '3 pares', value: 3 }, { label: '4 pares', value: 4 }, { label: '6 pares', value: 6 }, { label: '8 pares', value: 8 }, { label: '10 pares', value: 10 }, { label: '12 pares', value: 12 }] }, players()],
       actions: [{ label: 'Jogar', mode: 'play', primary: true }],
       icon: '<svg viewBox="0 0 64 64"><rect x="6" y="12" width="24" height="36" rx="6" fill="var(--accent)"/><rect x="34" y="16" width="24" height="36" rx="6" fill="var(--tile)" stroke="var(--ball)" stroke-width="4"/><text x="18" y="39" text-anchor="middle" font-size="22" font-weight="700" fill="#fff" font-family="inherit">?</text><circle cx="46" cy="34" r="7" fill="#ffb800"/></svg>' },
-    { id: 'baloes', title: 'Balões', desc: 'Toque nos balões para estourar', run: baloes,
-      groups: [{ key: 'speed', label: 'Velocidade', options: [{ label: 'Calmo', value: 'calm' }, { label: 'Normal', value: 'normal' }] }],
-      actions: [{ label: 'Jogar', mode: 'play', primary: true }],
-      icon: '<svg viewBox="0 0 64 64"><ellipse cx="24" cy="24" rx="14" ry="17" fill="var(--accent)"/><ellipse cx="42" cy="28" rx="12" ry="15" fill="var(--ball)"/><path d="M24 41L28 60M42 43L38 60" stroke="var(--ink-soft)" stroke-width="2" fill="none"/></svg>' },
-    { id: 'pintar', title: 'Pintar', desc: '', run: pintar, compact: true, extra: paintPicker, subject: 'casa',
-      extraOpts: function (g) { return { subject: g.subject }; },
-      groups: [{ key: 'how', label: 'Como pintar', options: [{ label: 'Preencher (toque)', value: 'fill' }, { label: 'Pincel (dedo)', value: 'brush' }] }],
-      actions: [{ label: 'Pintar', mode: 'play', primary: true }],
-      icon: '<svg viewBox="0 0 64 64"><path d="M32 6C16 6 6 18 6 30c0 12 10 22 22 22 6 0 6-5 3-8-3-4 0-8 5-8h8c8 0 14-5 14-12C58 14 46 6 32 6z" fill="var(--tile)" stroke="var(--ink-soft)" stroke-width="3"/><circle cx="20" cy="26" r="5" fill="#ef4444"/><circle cx="32" cy="18" r="5" fill="#facc15"/><circle cx="45" cy="24" r="5" fill="#22c55e"/><circle cx="18" cy="40" r="5" fill="#3b82f6"/></svg>' },
     { id: 'contar', title: 'Contar', desc: 'Toque nos objetos para contar e escolha o número', run: contar,
       groups: [{ key: 'max', label: 'Até quanto', options: [{ label: 'Até 5', value: 5 }, { label: 'Até 10', value: 10 }, { label: 'Até 20', value: 20 }, { label: 'Até 30', value: 30 }] }],
       actions: [{ label: 'Jogar', mode: 'play', primary: true }],
@@ -2136,10 +1552,6 @@ canvas.brush { touch-action: none; }
       actions: [{ label: 'Jogar', mode: 'play', primary: true }],
       icon: '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="#0f1220"/><path d="M32 32V6A26 26 0 0 0 6 32z" fill="#15803d"/><path d="M32 32H58A26 26 0 0 0 32 6z" fill="#b91c1c"/><path d="M32 32H6A26 26 0 0 0 32 58z" fill="#a16207"/><path d="M32 32V58A26 26 0 0 0 58 32z" fill="#1d4ed8"/><circle cx="32" cy="32" r="9" fill="#0f1220"/></svg>' }
 ,
-    { id: 'quebra', title: 'Quebra-Cabeça', desc: 'Toque em duas peças para trocar de lugar', run: quebra,
-      groups: [{ key: 'n', label: 'Quantas peças', def: 0, options: [{ label: '4 peças', value: 4 }, { label: '6 peças', value: 6 }, { label: '9 peças', value: 9 }, { label: '12 peças', value: 12 }, { label: '16 peças', value: 16 }, { label: '20 peças', value: 20 }] }],
-      actions: [{ label: 'Jogar', mode: 'play', primary: true }],
-      icon: '<span class="emo">🧩</span>' },
     { id: 'pontos', title: 'Ligar os Pontos', desc: 'Toque nos números em ordem. “Crescente” começa fácil e aumenta a cada desenho.', run: pontos,
       groups: [{ key: 'lvl', label: 'Quantos pontos', def: 0, options: [{ label: 'Crescente', value: 'auto' }, { label: 'Poucos', value: 'easy' }, { label: 'Médios', value: 'mid' }, { label: 'Muitos', value: 'hard' }] }],
       actions: [{ label: 'Jogar', mode: 'play', primary: true }],
@@ -2181,13 +1593,13 @@ canvas.brush { touch-action: none; }
   ];
   GAMES.forEach(function (g) { g.groups.forEach(function (gr) { gr.sel = gr.def || 0; }); });
 
-  var SCREENS = ['hub', 'gmenu', 'play', 'settings', 'album'];
+  var SCREENS = ['hub', 'gmenu', 'play', 'settings'];
   function show(id) { SCREENS.forEach(function (s) { $(s).hidden = s !== id; }); }
   function stopGame() {
     gtoken++; cleanups.forEach(function (f) { try { f(); } catch (e) {} }); cleanups = [];
     stopSpeech(); $('confetti').innerHTML = ''; $('playArea').innerHTML = '';
   }
-  function showHub() { stopGame(); current = null; show('hub'); updateAlbumBtn(); }
+  function showHub() { stopGame(); current = null; show('hub'); }
   function showMenu(g) {
     stopGame(); current = g; show('gmenu');
     var m = $('gmenu');
@@ -2217,7 +1629,7 @@ canvas.brush { touch-action: none; }
     updateSnd();
   }
   function startGame(g, mode) {
-    stopGame(); current = g; show('play'); $('ptitle').textContent = g.title;
+    stopGame(); current = g; show('play'); $('ptitle').textContent = g.title; countPlay(g);
     var opts = {}; g.groups.forEach(function (gr) { opts[gr.key] = gr.options[gr.sel].value; });
     if (g.extraOpts) { var x = g.extraOpts(g); for (var k in x) opts[k] = x[k]; }
     var api = { restart: function () { startGame(g, mode); }, onStop: function (f) { cleanups.push(f); } };
@@ -2258,7 +1670,7 @@ canvas.brush { touch-action: none; }
     fillSel();
     if (synth && synth.addEventListener) { var h = function () { if (!$('settings').hidden) fillSel(); }; synth.addEventListener('voiceschanged', h); cleanups.push(function () { synth.removeEventListener('voiceschanged', h); }); }
     sel.addEventListener('change', function () { cfg.voiceName = sel.value; saveCfg(); speak('Olá! Eu sou a nova voz.'); });
-    $('vTest').addEventListener('click', function () { speak('Olá! Vamos brincar de contar, pintar e achar os pares?'); });
+    $('vTest').addEventListener('click', function () { speak('Olá! Vamos brincar de contar e achar os pares?'); });
     tip.textContent = !synth ? 'Este navegador não tem voz falada.' :
       !ptVoices.length ? 'Nenhuma voz em português encontrada. No Android, instale a voz do Google: Configurações › Sistema › Idiomas › Saída de texto para fala › Google › Instalar dados de voz › Português (Brasil). No iPhone: Ajustes › Acessibilidade › Conteúdo Falado › Vozes › Português.' :
       !auto ? 'Só encontrei vozes de Portugal. Instale a voz Português (Brasil) do aparelho para um sotaque brasileiro.' :
@@ -2269,62 +1681,38 @@ canvas.brush { touch-action: none; }
   }
   $('btnVoz').addEventListener('click', showSettings);
 
-  /* ---------- ÁLBUM DE FIGURINHAS ---------- */
-  var STK = [['🦄', 'unicórnio'], ['🐼', 'panda'], ['🐨', 'coala'], ['🦊', 'raposa'], ['🐻', 'urso'], ['🦁', 'leão'], ['🐯', 'tigre'], ['🐸', 'sapo'], ['🐵', 'macaco'], ['🐔', 'galinha'],
-    ['🐧', 'pinguim'], ['🐦', 'passarinho'], ['🦉', 'coruja'], ['🦋', 'borboleta'], ['🐞', 'joaninha'], ['🐝', 'abelha'], ['🐢', 'tartaruga'], ['🐙', 'polvo'], ['🐬', 'golfinho'], ['🐳', 'baleia'],
-    ['🦈', 'tubarão'], ['🦀', 'caranguejo'], ['🐘', 'elefante'], ['🦒', 'girafa'], ['🦓', 'zebra'], ['🐴', 'cavalo'], ['🐮', 'vaca'], ['🐷', 'porquinho'], ['🐑', 'ovelhinha'], ['🐰', 'coelhinho'],
-    ['🐶', 'cachorrinho'], ['🐱', 'gatinho'], ['🦕', 'dinossauro'], ['🐊', 'jacaré'], ['🦜', 'papagaio'], ['🦩', 'flamingo'], ['🚀', 'foguete'], ['🚁', 'helicóptero'], ['🚂', 'trem'], ['🚒', 'caminhão de bombeiro'],
-    ['🚜', 'trator'], ['🚲', 'bicicleta'], ['⛵', 'barquinho'], ['🚓', 'carro de polícia'], ['🚑', 'ambulância'], ['🍎', 'maçã'], ['🍌', 'banana'], ['🍓', 'morango'], ['🍉', 'melancia'], ['🍇', 'uva'],
-    ['🍍', 'abacaxi'], ['🍕', 'pizza'], ['🍦', 'sorvete'], ['🧁', 'cupcake'], ['🍪', 'biscoito'], ['🌈', 'arco-íris'], ['⭐', 'estrela'], ['🌙', 'lua'], ['☀️', 'sol'], ['🌻', 'girassol'],
-    ['🌳', 'árvore'], ['🎈', 'balão'], ['⚽', 'bola'], ['🎨', 'tintas'], ['👑', 'coroa']];
-  var album = [];
-  try { album = (JSON.parse(localStorage.getItem('cantinho.album') || '[]') || []).filter(function (i) { return i >= 0 && i < STK.length; }); } catch (e) {}
-  var newest = -1, toastEl = null, toastT = 0;
-  function saveAlbum() { try { localStorage.setItem('cantinho.album', JSON.stringify(album)); } catch (e) {} }
-  function albumLabel() { return '🏆 Álbum ' + album.length + '/' + STK.length; }
-  function updateAlbumBtn() { var b = $('btnAlbum'); if (b) b.textContent = albumLabel(); }
-  function giveSticker() {
-    var free = []; for (var i = 0; i < STK.length; i++) if (album.indexOf(i) < 0) free.push(i);
-    if (!free.length) return;
-    var id = pick(free); album.push(id); newest = id; saveAlbum(); updateAlbumBtn();
-    if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'stk-toast'; toastEl.setAttribute('role', 'status'); document.body.appendChild(toastEl); }
-    toastEl.innerHTML = '<span class="e">' + STK[id][0] + '</span><span>Nova figurinha!<br><small>' + album.length + ' de ' + STK.length + '</small></span>';
-    toastEl.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove('on'); }, 3200);
+  /* ---------- ordenar os jogos ---------- */
+  var grid = $('hubGrid'), sortBox = $('hubSort');
+  var plays = {};
+  try { plays = JSON.parse(localStorage.getItem('cantinho.plays') || '{}') || {}; } catch (e) { plays = {}; }
+  function countPlay(g) { plays[g.id] = (plays[g.id] || 0) + 1; try { localStorage.setItem('cantinho.plays', JSON.stringify(plays)); } catch (e) {} }
+  var SORTS = [['default', 'Padrão'], ['az', 'A–Z'], ['most', 'Mais jogados']];
+  if (!SORTS.some(function (x) { return x[0] === cfg.sort; })) cfg.sort = 'default';
+  function sortedGames() {
+    var l = GAMES.map(function (g, i) { return { g: g, i: i }; });
+    if (cfg.sort === 'az') l.sort(function (a, b) { return a.g.title.localeCompare(b.g.title, 'pt-BR') || a.i - b.i; });
+    else if (cfg.sort === 'most') l.sort(function (a, b) { return (plays[b.g.id] || 0) - (plays[a.g.id] || 0) || a.i - b.i; });
+    return l.map(function (x) { return x.g; });
   }
-  function showAlbum() {
-    stopGame(); current = null; show('album');
-    var m = $('album');
-    m.innerHTML = '<div class="topbar"><button class="small-btn" data-a="home" type="button">&larr; Jogos</button><div class="ptitle">Álbum ' + album.length + '/' + STK.length + '</div><button class="small-btn snd" type="button"></button></div><div class="album-grid"></div>';
-    var g = m.querySelector('.album-grid');
-    STK.forEach(function (st, i) {
-      var b = document.createElement('button'); b.type = 'button'; var own = album.indexOf(i) >= 0;
-      b.className = 'stk' + (own ? '' : ' lock') + (own && i === newest ? ' new' : ''); b.textContent = own ? st[0] : '?'; b.setAttribute('aria-label', own ? st[1] : 'figurinha bloqueada');
-      if (own) b.addEventListener('click', function () { speak(st[1]); });
-      g.appendChild(b);
+  function renderHub() {
+    grid.innerHTML = '';
+    sortedGames().forEach(function (g) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'gcard';
+      b.innerHTML = g.icon + '<span>' + g.title + '</span>';
+      b.addEventListener('click', function () { showMenu(g); }); grid.appendChild(b);
     });
-    m.querySelector('[data-a="home"]').addEventListener('click', showHub);
-    m.querySelector('.snd').addEventListener('click', function () { cfg.sound = !cfg.sound; if (!cfg.sound) stopSpeech(); saveCfg(); updateSnd(); });
-    updateSnd(); newest = -1;
+    grid.scrollTop = 0;
   }
-  $('btnAlbum').addEventListener('click', showAlbum);
-  $('btnSurp').addEventListener('click', function () {
-    var g = bagPick('surp', GAMES); if (g.id === 'pintar') { var d = pick(DRAW.filter(function (x) { return x.id !== 'livre'; })); g.subject = d.id; }
-    var a = g.actions.filter(function (x) { return x.primary; })[0] || g.actions[0]; startGame(g, a.mode);
+  sortBox.innerHTML = '<span class="slabel">Ordenar</span>';
+  SORTS.forEach(function (s) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = s[1]; b.setAttribute('aria-pressed', String(cfg.sort === s[0]));
+    b.addEventListener('click', function () {
+      cfg.sort = s[0]; saveCfg(); renderHub();
+      sortBox.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c === b)); });
+    });
+    sortBox.appendChild(b);
   });
-  updateAlbumBtn();
-
-  var grid = $('hubGrid');
-  /* sugestão do dia: 3 jogos que mudam todo dia */
-  var seed = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
-  function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
-  var order = GAMES.map(function (g, i) { return i; });
-  for (var oi = order.length - 1; oi > 0; oi--) { var oj = Math.floor(rnd() * (oi + 1)), ot = order[oi]; order[oi] = order[oj]; order[oj] = ot; }
-  var todayIds = order.slice(0, 3), listed = todayIds.concat(order.slice(3).sort(function (a, b) { return a - b; }));
-  listed.forEach(function (gi) {
-    var g = GAMES[gi], b = document.createElement('button'); b.type = 'button'; b.className = 'gcard';
-    b.innerHTML = (todayIds.indexOf(gi) >= 0 ? '<span class="today">Hoje</span>' : '') + g.icon + '<span>' + g.title + '</span>';
-    b.addEventListener('click', function () { showMenu(g); }); grid.appendChild(b);
-  });
+  renderHub();
   updateSnd(); show('hub');
   if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
 })();
