@@ -17,7 +17,7 @@ App web (PWA) com mini-jogos de 10 minutos para a rotina da noite: atenção, or
 
 ## Como funciona
 
-**Missões do dia:** 3 por noite (configurável de 1 a 5), uma de cada tipo, rotacionando por dia.
+**Missões do dia:** 4 por noite (configurável de 1 a 5), rotacionando por dia; a missão de sossego/respeito vem sempre por último. O dia de uso vira às 04h.
 
 | Missão | Treina |
 |---|---|
@@ -28,9 +28,12 @@ App web (PWA) com mini-jogos de 10 minutos para a rotina da noite: atenção, or
 | Seu mestre mandou | controle inibitório (esperar, não tocar) |
 | Memória | memória de trabalho (pares) |
 | Luzes mágicas | memória de sequência |
-| Respirar e dormir | desacelerar (1 min, sem pontuação) |
+| Soninho do dragão | sossego: ficar quietinho sem tocar na tela (10 a 30 s por rodada) |
+| Cada um na sua vez | respeito: esperar o amigo jogar antes de tocar |
+| O que é gentil? | respeito: escolher a atitude gentil em situações do dia a dia |
+| Respirar e dormir | desacelerar (~80 s, sem pontuação; abre sozinho ao fim das missões) |
 
-**Níveis (1 a 3):** sobem após 2 sessões com ≥ 85% de acerto e descem após 2 sessões com < 50%. Dá para ajustar à mão na área dos pais.
+**Níveis (1 a 4):** sobem com ≥ 90% de acerto numa sessão (ou ≥ 80% em 2 seguidas) e descem após 2 sessões com < 50%. A área dos pais mostra o progresso de cada missão. Dá para ajustar à mão na área dos pais.
 
 **Limite diário:** ao completar as missões do dia, só resta a respiração. A criança acaba pedindo "mais" no dia seguinte, o que reforça o hábito.
 

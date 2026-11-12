@@ -7,6 +7,9 @@
   // Data LOCAL (não usar toISOString: em UTC-3 vira o dia seguinte a partir das 21h).
   const localDate = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const localTime = (d = new Date()) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  // "Dia de uso" vira às 04h: sessão depois da meia-noite conta para a noite anterior (limite diário não reinicia à 00h).
+  const logical = (d = new Date()) => new Date(d.getTime() - 4 * 36e5);
+  const dayKey = (d = new Date()) => localDate(logical(d));
   const dayNumber = (d = new Date()) => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
   const rand = n => Math.floor(Math.random() * n);
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
@@ -51,7 +54,7 @@
     }
   };
 
-  const DEFAULTS = { childName: 'Bento', guideName: 'Super Amigo', guideEmoji: '🦸', clubName: 'Clube da Missão', perDay: 3, voiceName: '', voice: true, sound: true };
+  const DEFAULTS = { childName: 'Bento', guideName: 'Super Amigo', guideEmoji: '🦸', clubName: 'Clube da Missão', perDay: 4, voiceName: '', voice: true, sound: true };
   const GUIDES = ['🦸', '🐶', '🐻', '🦁', '🦖', '🚀', '⚽', '🤖'];
 
   let settings = Object.assign({}, DEFAULTS, store.get('settings', {}));
@@ -177,37 +180,44 @@
   }
 
   /* ================= níveis e registros ================= */
+  const MAXLV = 4;
+  const UP_NOW = 0.9, UP_GOOD = 0.8; // sobe com ≥90% numa sessão, ou ≥80% em 2 seguidas
   function lvOf(id) {
     const v = levels[id];
     return (v && typeof v === 'object')
-      ? { lv: clamp(+v.lv || 1, 1, 3), good: +v.good || 0, bad: +v.bad || 0 }
+      ? { lv: clamp(+v.lv || 1, 1, MAXLV), good: +v.good || 0, bad: +v.bad || 0 }
       : { lv: 1, good: 0, bad: 0 };
   }
   function adapt(id, c, e) {
     const tot = c + e; if (!tot) return;
     const s = lvOf(id), acc = c / tot;
-    if (acc >= 0.85) { s.good++; s.bad = 0; if (s.good >= 2 && s.lv < 3) { s.lv++; s.good = 0; } }
+    if (acc >= UP_NOW) { s.good = 0; s.bad = 0; if (s.lv < MAXLV) s.lv++; }
+    else if (acc >= UP_GOOD) { s.good++; s.bad = 0; if (s.good >= 2 && s.lv < MAXLV) { s.lv++; s.good = 0; } }
     else if (acc < 0.5) { s.bad++; s.good = 0; if (s.bad >= 2 && s.lv > 1) { s.lv--; s.bad = 0; } }
     else { s.good = 0; s.bad = 0; }
     levels[id] = s; store.set('levels', levels);
   }
-  const missionsToday = () => log.filter(x => x.d === localDate() && x.m !== 'calma');
+  const missionsToday = () => log.filter(x => x.d === dayKey() && x.m !== 'calma');
   function pushLog(entry) {
     log.push(entry);
     if (log.length > 5000) log = log.slice(-5000);
     store.set('log', log);
   }
-  function weekDates(d = new Date()) {
+  function weekDates(d = logical()) {
     const wd = (d.getDay() + 6) % 7; // segunda = 0
     return Array.from({ length: 7 }, (_, i) => localDate(new Date(d.getFullYear(), d.getMonth(), d.getDate() - wd + i)));
   }
 
   /* ================= missões ================= */
   const MISSIONS = {};
-  const GROUPS = [['letras', 'mestre'], ['nome', 'numeros', 'nome', 'contar'], ['memoria', 'sequencia']];
+  // 0 = atenção/memória, 1 = letras/números, 2 = sossego/respeito (sempre por último)
+  const GROUPS = [['letras', 'mestre', 'memoria', 'sequencia'], ['nome', 'numeros', 'contar'], ['soninho', 'gentil', 'vez']];
   function todays() {
-    const dn = dayNumber();
-    return [GROUPS[0][dn % 2], GROUPS[1][dn % 4], GROUPS[2][Math.floor(dn / 2) % 2]];
+    const dn = dayNumber(logical());
+    const base = [GROUPS[0][dn % 4], GROUPS[1][dn % 3], GROUPS[2][(dn + Math.floor(dn / 3)) % 3]];
+    const rest = [...GROUPS[0], ...GROUPS[1]].filter(id => !base.includes(id));
+    const extra = rest.map((_, k) => rest[(k + dn) % rest.length]).slice(0, Math.max(0, Math.min(settings.perDay, 5) - 3));
+    return [base[0], base[1], ...extra, base[2]];
   }
 
   function startMission(id) {
@@ -245,7 +255,7 @@
 
   function endMission(m, stats, secs) {
     const now = new Date();
-    pushLog({ d: localDate(now), t: localTime(now), m: m.id, lv: lvOf(m.id).lv, c: stats.correct, e: stats.errors, s: secs });
+    pushLog({ d: dayKey(now), t: localTime(now), m: m.id, lv: lvOf(m.id).lv, c: stats.correct, e: stats.errors, s: secs });
     adapt(m.id, stats.correct, stats.errors);
     celebrate();
   }
@@ -265,6 +275,7 @@
       } else {
         kids.push(h('p', { class: 'bubble' }, 'Por hoje chega! Amanhã tem mais.'));
         kids.push(h('button', { class: 'big-btn alt rest', type: 'button', onclick: () => calma() }, '🌙 Respirar e dormir'));
+        timeout(calma, 7000); // fecha o dia com a respiração (nos registros, ninguém tocava no botão)
       }
       return h('div', { class: 'screen celebrate' }, kids);
     });
@@ -283,10 +294,10 @@
         h('span', null, h('span', { class: 'avatar' }, settings.guideEmoji), h('span', { class: 'gname' }, settings.guideName)),
         h('span', { class: 'bubble' }, text));
 
-      const COLORS = ['#ffd23f', '#4cc9f0', '#3ddc97'];
+      const COLORS = ['#ffd23f', '#4cc9f0', '#ff9f1c', '#3ddc97', '#ff8fab'];
       const cards = todays().map((id, i) => {
         const m = MISSIONS[id], isDone = doneIds.has(id);
-        const b = h('button', { class: 'card' + (isDone ? ' done' : ''), type: 'button', 'data-mission': id, style: { '--c': COLORS[i] }, disabled: left <= 0 },
+        const b = h('button', { class: 'card' + (isDone ? ' done' : ''), type: 'button', 'data-mission': id, style: { '--c': COLORS[i % COLORS.length] }, disabled: left <= 0 },
           h('span', { class: 'emoji' }, m.emoji), h('span', { class: 'label' }, m.title), isDone ? h('span', null, '✅') : null);
         b.addEventListener('click', () => { sfx.tap(); startMission(id); });
         return b;
@@ -294,7 +305,7 @@
       const calm = h('button', { class: 'card calm', type: 'button', onclick: () => calma() },
         h('span', { class: 'emoji' }, '🌙'), h('span', { class: 'label' }, 'Respirar e dormir'));
 
-      const wk = weekDates(), active = new Set(log.filter(x => x.m !== 'calma').map(x => x.d)), today = localDate();
+      const wk = weekDates(), active = new Set(log.filter(x => x.m !== 'calma').map(x => x.d)), today = dayKey();
       const stars = wk.map((d, i) => h('div', { class: 'day' + (active.has(d) ? ' on' : '') + (d === today ? ' today' : '') },
         h('span', { class: 'star' }, '⭐'), h('span', { class: 'dl' }, 'STQQSSD'[i])));
       const count = wk.filter(d => active.has(d)).length;
@@ -311,7 +322,7 @@
   /* ---------- calma (respiração) ---------- */
   function calma() {
     render(() => {
-      const CYCLES = 6, t0 = Date.now();
+      const CYCLES = 8, t0 = Date.now();
       let n = 0, ended = false;
       const circle = h('div', { class: 'breath' });
       const label = h('div', { class: 'breath-label' }, '🌬️');
@@ -337,7 +348,7 @@
       function end() {
         if (ended) return; ended = true;
         const d = new Date();
-        pushLog({ d: localDate(d), t: localTime(d), m: 'calma', lv: 0, c: 1, e: 0, s: Math.round((Date.now() - t0) / 1000) });
+        pushLog({ d: dayKey(d), t: localTime(d), m: 'calma', lv: 0, c: 1, e: 0, s: Math.round((Date.now() - t0) / 1000) });
         label.textContent = '🌙 Boa noite!';
         say('Boa noite!');
         stage.append(h('button', { class: 'big-btn alt', type: 'button', onclick: () => home() }, 'Fechar'));
@@ -354,8 +365,8 @@
   MISSIONS.letras = {
     id: 'letras', emoji: '🔎', title: 'Caça-letras',
     run(c) {
-      const L = c.level, rounds = [0, 6, 7, 8][L];
-      const cfg = [null, { cols: 3, cells: 9, t: 2 }, { cols: 3, cells: 12, t: 3 }, { cols: 4, cells: 16, t: 4 }][L];
+      const L = c.level, rounds = [0, 6, 7, 8, 8][L];
+      const cfg = [null, { cols: 3, cells: 9, t: 2 }, { cols: 3, cells: 12, t: 3 }, { cols: 4, cells: 16, t: 4 }, { cols: 4, cells: 20, t: 5 }][L];
       const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
       const CONF = { B: 'DPR', D: 'BOP', P: 'BRF', Q: 'OGP', M: 'NW', N: 'MZH', W: 'MV', E: 'FL', F: 'EP', O: 'QCD', A: 'VH', S: 'ZC', V: 'UW', U: 'VO', L: 'IT', T: 'IL', R: 'BP', G: 'CQ', C: 'GO', H: 'NA' };
       const TARGETS = Object.keys(CONF);
@@ -396,7 +407,7 @@
   MISSIONS.memoria = {
     id: 'memoria', emoji: '🃏', title: 'Memória',
     run(c) {
-      const n = [0, 4, 6, 8][c.level], cols = 4;
+      const n = [0, 4, 6, 8, 10][c.level], cols = n === 10 ? 5 : 4;
       const faces = pick(EMO, n);
       const deck = shuffle([...faces, ...faces]).map((f, i) => ({ f, i, up: false, done: false, seen: false, el: null }));
       let first = null, lock = false, matched = 0;
@@ -476,9 +487,10 @@
     run(c) {
       const L = c.level, name = nameLetters();
       const SHORT = ['GOL', 'SOL', 'LUA', 'UVA', 'PAI', 'REI', 'BOI'];
+      const LONG2 = ['GIRAFA', 'COELHO', 'FOGUETE', 'ESTRELA', 'TUBARAO', 'ELEFANTE'];
       const LONG = ['BOLA', 'PATO', 'GATO', 'CASA', 'FOCA', 'DEDO', 'AMIGO', 'BANANA'];
-      const IMG = { GOL: '🥅', SOL: '☀️', LUA: '🌙', UVA: '🍇', PAI: '👨', REI: '👑', BOI: '🐂', BOLA: '⚽', PATO: '🦆', GATO: '🐱', CASA: '🏠', FOCA: '🦭', DEDO: '☝️', AMIGO: '🤝', BANANA: '🍌' };
-      const words = [name, ...pick(L === 1 ? SHORT : LONG, 3), name];
+      const IMG = { GOL: '🥅', SOL: '☀️', LUA: '🌙', UVA: '🍇', PAI: '👨', REI: '👑', BOI: '🐂', BOLA: '⚽', PATO: '🦆', GATO: '🐱', CASA: '🏠', FOCA: '🦭', DEDO: '☝️', AMIGO: '🤝', BANANA: '🍌', GIRAFA: '🦒', COELHO: '🐰', FOGUETE: '🚀', ESTRELA: '⭐', TUBARAO: '🦈', ELEFANTE: '🐘' };
+      const words = [name, ...pick(L === 1 ? SHORT : (L === 4 ? LONG2 : LONG), 3), name];
       function round(i) {
         if (i >= words.length) return c.finish();
         c.progress(i, words.length);
@@ -502,7 +514,8 @@
       const rounds = [null,
         [rng(1, 4), rng(1, 5), rng(1, 5), rng(2, 6), rng(1, 6)],
         [rng(1, 6), rng(1, 8), rng(4, 9), rng(3, 8), rng(1, 9)],
-        [rng(1, 10), rng(1, 5).reverse(), rng(1, 8).reverse(), rng(1, 10), rng(1, 6).reverse(), rng(5, 10).reverse()]][L];
+        [rng(1, 10), rng(1, 5).reverse(), rng(1, 8).reverse(), rng(1, 10), rng(1, 6).reverse(), rng(5, 10).reverse()],
+        [rng(1, 12), rng(1, 8).reverse(), [2, 4, 6, 8, 10], [5, 10, 15, 20], rng(4, 12), rng(1, 10).reverse(), [10, 20, 30, 40, 50]]][L];
       function round(i) {
         if (i >= rounds.length) return c.finish();
         c.progress(i, rounds.length);
@@ -521,8 +534,9 @@
   MISSIONS.contar = {
     id: 'contar', emoji: '⚽', title: 'Conta as bolas',
     run(c) {
-      const [lo, hi] = [null, [1, 5], [3, 8], [5, 12]][c.level], rounds = 8;
+      const [lo, hi] = [null, [1, 5], [3, 8], [5, 12], [8, 15]][c.level], rounds = 8;
       const ITEM = ['⚽', '🚀', '⭐', '🍎', '🐶', '🌙'];
+      const NAMES = { '⚽': 'as bolas', '🚀': 'os foguetes', '⭐': 'as estrelas', '🍎': 'as maçãs', '🐶': 'os cachorros', '🌙': 'as luas' };
       let last = 0;
       function round(i) {
         if (i >= rounds) return c.finish();
@@ -531,6 +545,13 @@
         last = n;
         const emo = pick(ITEM, 1)[0];
         let counted = 0, solved = false;
+        const label = c.level === 4 ? `Conta só ${NAMES[emo]} e escolhe: quantos tem?` : 'Conta e escolhe: quantos tem?';
+        const dEmo = pick(ITEM.filter(x => x !== emo), 1)[0];
+        const distractors = c.level === 4 ? Array.from({ length: 2 + rand(4) }, () => {
+          const b = h('button', { class: 'item', type: 'button', style: { transform: `rotate(${rand(21) - 10}deg)` } }, dEmo);
+          b.addEventListener('click', () => { if (b.dataset.x || solved) return; b.dataset.x = '1'; c.bad(); b.style.opacity = '.35'; shake(b); });
+          return b;
+        }) : [];
         const items = Array.from({ length: n }, () => {
           const b = h('button', { class: 'item', type: 'button', style: { transform: `rotate(${rand(21) - 10}deg)` } }, emo);
           b.addEventListener('click', () => {
@@ -558,10 +579,10 @@
           return b;
         });
         c.stage.replaceChildren(
-          h('button', { class: 'prompt', type: 'button', onclick: () => c.say('Conta e escolhe: quantos tem?') }, '🔊', h('span', { class: 'icon-big' }, '❓')),
-          h('div', { class: 'field' }, items),
+          h('button', { class: 'prompt', type: 'button', onclick: () => c.say(label) }, '🔊', h('span', { class: 'icon-big' }, '❓')),
+          h('div', { class: 'field' }, shuffle([...items, ...distractors])),
           h('div', { class: 'answers' }, answers));
-        c.say('Conta e escolhe: quantos tem?');
+        c.say(label);
       }
       round(0);
     }
@@ -572,8 +593,8 @@
     id: 'mestre', emoji: '🚦', title: 'Seu mestre mandou',
     run(c) {
       const L = c.level;
-      const rounds = [0, 8, 10, 12][L], waitMs = [0, 3500, 3000, 2500][L];
-      const noGo = Math.max(1, Math.round(rounds * [0, 0.25, 0.33, 0.4][L]));
+      const rounds = [0, 8, 10, 12, 14][L], waitMs = [0, 2500, 3500, 4500, 5500][L];
+      const noGo = Math.max(1, Math.round(rounds * [0, 0.25, 0.33, 0.4, 0.45][L]));
       const plan = Array(rounds).fill(true);
       pick(Array.from({ length: rounds - 1 }, (_, k) => k + 1), noGo).forEach(i => { plan[i] = false; });
       const ITEMS = [['⚽', 'na bola'], ['🚀', 'no foguete'], ['⭐', 'na estrela'], ['🍎', 'na maçã'], ['🐶', 'no cachorro'], ['🦖', 'no dinossauro']];
@@ -609,8 +630,8 @@
   MISSIONS.sequencia = {
     id: 'sequencia', emoji: '💡', title: 'Luzes mágicas',
     run(c) {
-      const base = [0, 2, 3, 4][c.level], lens = [base, base, base + 1, base + 1, base + 1];
-      const STEP = 1000, LIT = 550, DEBOUNCE = 300;
+      const base = [0, 2, 3, 4, 5][c.level], lens = c.level === 4 ? [5, 5, 5, 6, 6] : [base, base, base + 1, base + 1, base + 1];
+      const STEP = [0, 1000, 1000, 950, 900][c.level], LIT = [0, 550, 550, 500, 450][c.level], DEBOUNCE = 300;
       const FREQ = [262, 330, 392, 523];
       let seq = [], pos = 0, inputOn = false, attempts = 0, ri = 0, lastPress = 0;
       const padTimer = [];
@@ -660,6 +681,169 @@
     }
   };
 
+  /* ---------- 8. soninho do dragão (sossego: ficar quietinho) ---------- */
+  MISSIONS.soninho = {
+    id: 'soninho', emoji: '🐲', title: 'Soninho do dragão',
+    run(c) {
+      const secs = [0, 10, 15, 20, 30][c.level], rounds = 3, MAXWAKE = 3;
+      let tok = 0, asleep = false, cur = { i: 0, wakes: 0 };
+      const dragon = h('div', { class: 'dragon', 'aria-hidden': 'true' }, '🐲');
+      const zone = h('div', { class: 'zzz-zone', 'aria-hidden': 'true' });
+      const fill = h('span');
+      const msg = h('div', { class: 'banner stop' }, '');
+      c.stage.replaceChildren(msg, h('div', { class: 'dragon-wrap' }, zone, dragon), h('div', { class: 'sleepbar' }, fill));
+      const setFill = ms => {
+        fill.style.transition = 'none'; fill.style.width = '0%'; void fill.offsetWidth;
+        if (ms) { fill.style.transition = `width ${ms}ms linear`; fill.style.width = '100%'; }
+      };
+      // qualquer toque na área do jogo enquanto ele dorme = acordou
+      c.stage.addEventListener('pointerdown', () => { if (asleep) wake(); });
+
+      function wake() {
+        asleep = false; tok++;
+        c.bad(); setFill(0);
+        dragon.textContent = '😲'; dragon.classList.remove('sleep'); shake(dragon);
+        msg.className = 'banner stop'; msg.textContent = '😲 Acordou!';
+        const { i, wakes } = cur;
+        if (wakes + 1 >= MAXWAKE) { c.say('Tudo bem. Vamos para a próxima.'); c.timeout(() => round(i + 1), 2200); }
+        else { c.say('Ops! Ele acordou. Vamos de novo, bem quietinho.'); c.timeout(() => round(i, wakes + 1), 3000); }
+      }
+      function round(i, wakes = 0) {
+        if (i >= rounds) return c.finish();
+        const my = ++tok;
+        c.progress(i, rounds);
+        asleep = false; cur = { i, wakes };
+        dragon.textContent = '🐲'; dragon.className = 'dragon';
+        zone.replaceChildren(); setFill(0);
+        msg.className = 'banner stop'; msg.textContent = '🤫 Shhh… ele vai dormir';
+        const first = i === 0 && wakes === 0;
+        if (first) c.say('Shhh. O dragãozinho vai dormir. Fique bem quietinho, sem tocar na tela.');
+        c.timeout(() => {
+          if (my !== tok) return;
+          asleep = true; dragon.textContent = '😴'; dragon.classList.add('sleep');
+          msg.className = 'banner go'; msg.textContent = '😴 Ele dormiu. Quietinho!';
+          setFill(secs * 1000);
+          for (let z = 1; z * 2200 < secs * 1000; z++) {
+            c.timeout(() => { if (my === tok && asleep) zone.append(h('span', { class: 'zzz' }, 'z')); }, z * 2200);
+          }
+          c.timeout(() => {
+            if (my !== tok || !asleep) return;
+            asleep = false; c.ok();
+            dragon.textContent = '😊'; dragon.classList.remove('sleep'); dragon.classList.add('pop');
+            msg.textContent = '⭐ Conseguiu! Que sossego!';
+            c.timeout(() => round(i + 1), 1600);
+          }, secs * 1000);
+        }, first ? 5500 : 1800);
+      }
+      round(0);
+    }
+  };
+
+  /* ---------- 9. cada um na sua vez (respeito: esperar a vez do outro) ---------- */
+  MISSIONS.vez = {
+    id: 'vez', emoji: '🤝', title: 'Cada um na sua vez',
+    run(c) {
+      const turns = [0, 4, 5, 6, 7][c.level], waitMs = [0, 1800, 2800, 3800, 4800][c.level], total = turns * 2;
+      const [fEmo, fName] = pick([['🐱', 'do gatinho'], ['🐶', 'do cachorro'], ['🤖', 'do robô'], ['🦊', 'da raposa']], 1)[0];
+      const me = settings.guideEmoji;
+      let k = 0, mine = false, penalized = false, tok = 0;
+      const banner = h('div', { class: 'banner go' }, '🤝 Vamos revezar!');
+      const cells = Array.from({ length: total }, (_, j) => {
+        const b = h('button', { class: 'cell trail', type: 'button', 'aria-label': 'Casa ' + (j + 1) });
+        b.addEventListener('click', () => press(j, b));
+        return b;
+      });
+      c.stage.replaceChildren(banner, h('div', { class: 'grid', style: { '--cols': total % 4 === 0 ? 4 : 5 } }, cells));
+      c.progress(0, turns);
+      const put = (j, emo) => { cells[j].textContent = emo; cells[j].classList.remove('next'); cells[j].classList.add('filled'); };
+
+      function friendTurn() {
+        if (k >= total) return c.finish();
+        mine = false; penalized = false;
+        const my = ++tok;
+        banner.className = 'banner stop'; banner.textContent = `✋ Vez ${fName}. Espere!`;
+        cells[k].classList.add('next');
+        if (k === 0) c.say(`Cada um na sua vez. Primeiro é a vez ${fName}. Espere.`);
+        else if (k < 4) c.say(`Vez ${fName}. Espere.`);
+        c.timeout(() => { if (my !== tok) return; put(k, fEmo); k++; tone(400, .15, 'triangle', .12); myTurn(); }, waitMs);
+      }
+      function myTurn() {
+        if (k >= total) return c.finish();
+        mine = true;
+        banner.className = 'banner go'; banner.textContent = '✅ Sua vez!';
+        cells[k].classList.add('next');
+        if (k < 5) c.say('Sua vez!');
+      }
+      function press(j, b) {
+        if (k >= total) return;
+        if (!mine) { // tocou na vez do amigo: 1 erro por vez, sem punir toque repetido
+          shake(b); sfx.tap();
+          if (!penalized) { penalized = true; c.bad(); }
+          return;
+        }
+        if (j !== k) return;
+        mine = false; put(j, me); k++; c.ok(); c.progress(Math.floor(k / 2), turns);
+        c.timeout(friendTurn, 700);
+      }
+      c.timeout(friendTurn, 900);
+    }
+  };
+
+  /* ---------- 10. o que é gentil? (respeito: escolhas do dia a dia) ---------- */
+  const KIND = [
+    { e: '🧸', t: 'Seu amigo está brincando com um brinquedo. Você quer também.', o: [['🗣️', 'Pedir por favor', 1], ['🤚', 'Pegar sem pedir', 0], ['😠', 'Gritar', 0]] },
+    { e: '👶', t: 'O bebê está dormindo.', o: [['🤫', 'Falar baixinho', 1], ['📢', 'Gritar bem alto', 0], ['🥁', 'Bater no tambor', 0]] },
+    { e: '🎁', t: 'Alguém te deu um presente.', o: [['🙏', 'Dizer obrigado', 1], ['😶', 'Não falar nada', 0], ['😒', 'Reclamar', 0]] },
+    { e: '🛝', t: 'Tem fila para o escorregador.', o: [['🧍', 'Esperar a minha vez', 1], ['🏃', 'Furar a fila', 0], ['🤜', 'Empurrar', 0]] },
+    { e: '👩', t: 'A mamãe está falando com você.', o: [['👂', 'Olhar e escutar', 1], ['🎮', 'Continuar no jogo', 0], ['🙉', 'Tampar os ouvidos', 0]] },
+    { e: '😢', t: 'Seu amigo está triste.', o: [['🤗', 'Perguntar se ele está bem', 1], ['😂', 'Rir dele', 0], ['🚶', 'Ir embora', 0]] },
+    { e: '💥', t: 'Você esbarrou sem querer no amigo.', o: [['🙇', 'Pedir desculpa', 1], ['🏃', 'Sair correndo', 0], ['😠', 'Culpar ele', 0]] },
+    { e: '🍪', t: 'Tem um biscoito para dois.', o: [['✂️', 'Dividir com o amigo', 1], ['😋', 'Comer tudo sozinho', 0], ['🙈', 'Esconder', 0]] },
+    { e: '🧹', t: 'A brincadeira acabou. Tem brinquedo no chão.', o: [['📦', 'Guardar os brinquedos', 1], ['🚪', 'Deixar a bagunça', 0], ['🦶', 'Chutar tudo', 0]] },
+    { e: '🌅', t: 'Você acorda de manhã e encontra a família.', o: [['👋', 'Dar bom dia', 1], ['😤', 'Bater a porta', 0], ['🙄', 'Ficar emburrado', 0]] },
+    { e: '🌙', t: 'É hora de dormir. Você quer mais um jogo, mas a mamãe disse não.', o: [['😌', 'Respirar e aceitar', 1], ['😭', 'Fazer birra', 0], ['📱', 'Pegar escondido', 0]] },
+    { e: '👵', t: 'A vovó está falando e você quer contar uma coisa.', o: [['✋', 'Esperar ela terminar', 1], ['🗣️', 'Falar por cima', 0], ['🙊', 'Gritar: eu! eu!', 0]] },
+    { e: '🏫', t: 'A professora está explicando.', o: [['🤫', 'Ficar quietinho e ouvir', 1], ['🏃', 'Levantar e correr', 0], ['🗯️', 'Conversar alto', 0]] },
+    { e: '🐶', t: 'Você vê um cachorrinho na rua.', o: [['🖐️', 'Perguntar ao dono antes de fazer carinho', 1], ['🏃', 'Correr atrás dele', 0], ['😱', 'Gritar perto dele', 0]] },
+    { e: '🍽️', t: 'A família está na mesa.', o: [['🪑', 'Comer sentadinho', 1], ['🏃', 'Correr pela casa com comida', 0], ['🥄', 'Brincar com a comida', 0]] },
+    { e: '🏆', t: 'Seu amigo ganhou o jogo.', o: [['👏', 'Dar parabéns', 1], ['😡', 'Jogar o jogo longe', 0], ['🙅', 'Dizer que ele roubou', 0]] },
+    { e: '📺', t: 'Você quer ver desenho, mas o papai está trabalhando.', o: [['🔈', 'Abaixar o volume', 1], ['🔊', 'Aumentar tudo', 0], ['🥁', 'Fazer barulho', 0]] },
+    { e: '🥤', t: 'Você quer um copo de água.', o: [['🙏', 'Pedir: água, por favor', 1], ['😠', 'Mandar: me dá!', 0], ['😭', 'Chorar sem falar', 0]] },
+    { e: '👦', t: 'Chegou um amigo novo na escola.', o: [['👋', 'Convidar para brincar', 1], ['🙅', 'Dizer que não pode', 0], ['🚶', 'Fingir que não viu', 0]] },
+    { e: '🛋️', t: 'A casa está calma e alguém está descansando.', o: [['🐾', 'Andar devagar e brincar baixinho', 1], ['🏃', 'Correr e gritar', 0], ['🥁', 'Bater panela', 0]] }
+  ];
+  MISSIONS.gentil = {
+    id: 'gentil', emoji: '💛', title: 'O que é gentil?',
+    run(c) {
+      const rounds = [0, 5, 6, 7, 8][c.level], nOpt = c.level === 1 ? 2 : 3;
+      const qs = pick(KIND, rounds);
+      function round(i) {
+        if (i >= rounds) return c.finish();
+        c.progress(i, rounds);
+        const q = qs[i];
+        const good = q.o.find(o => o[2]);
+        const opts = shuffle([good, ...pick(q.o.filter(o => !o[2]), nOpt - 1)]);
+        const text = `${q.t} O que é gentil? ${opts.map(o => o[1]).join(', ou ')}?`;
+        let solved = false;
+        const btns = opts.map(o => {
+          const b = h('button', { class: 'choice', type: 'button' }, h('span', { class: 'ce' }, o[0]), h('span', { class: 'ct' }, o[1]));
+          b.addEventListener('click', () => {
+            if (solved || b.disabled) return;
+            if (o[2]) { solved = true; c.ok(); b.classList.add('right'); c.say('Isso! Muito gentil!'); c.timeout(() => round(i + 1), 1700); }
+            else { c.bad(); b.disabled = true; shake(b); c.say('Hmm. E se fosse com você? Tente outra.'); }
+          });
+          return b;
+        });
+        c.stage.replaceChildren(
+          h('button', { class: 'prompt', type: 'button', onclick: () => c.say(text) }, '🔊', h('span', { class: 'icon-big' }, q.e)),
+          h('p', { class: 'bubble scene' }, q.t),
+          h('div', { class: 'choices' }, btns));
+        c.say(text);
+      }
+      round(0);
+    }
+  };
+
   /* ================= área dos pais ================= */
   function dayStats(d) {
     const L = log.filter(x => x.d === d && x.m !== 'calma');
@@ -667,7 +851,8 @@
     return Object.assign({
       n: L.length,
       acc: (c + e) ? Math.round(100 * c / (c + e)) : null,
-      calma: log.filter(x => x.d === d && x.m === 'calma').length
+      calma: log.filter(x => x.d === d && x.m === 'calma').length,
+      secs: log.filter(x => x.d === d).reduce((a, x) => a + (+x.s || 0), 0)
     }, days[d] || {});
   }
   function csvCell(v) {
@@ -681,8 +866,8 @@
   }
   function csvDays() {
     const all = Array.from(new Set([...Object.keys(days), ...log.map(x => x.d)])).sort();
-    return toCsv([['data', 'dormiu', 'tela_min', 'atencao_1a5', 'humor_1a5', 'missoes', 'acerto_pct', 'respiracoes', 'obs'],
-      ...all.map(d => { const s = dayStats(d); return [d, s.sleep || '', s.screen == null ? '' : s.screen, s.att == null ? '' : s.att, s.mood == null ? '' : s.mood, s.n, s.acc == null ? '' : s.acc, s.calma, s.note || '']; })]);
+    return toCsv([['data', 'dormiu', 'tela_min', 'atencao_1a5', 'humor_1a5', 'missoes', 'acerto_pct', 'respiracoes', 'obs', 'tempo_s'],
+      ...all.map(d => { const s = dayStats(d); return [d, s.sleep || '', s.screen == null ? '' : s.screen, s.att == null ? '' : s.att, s.mood == null ? '' : s.mood, s.n, s.acc == null ? '' : s.acc, s.calma, s.note || '', s.secs]; })]);
   }
   function showText(title, text) {
     const ta = h('textarea', { class: 'inp area', readonly: true, rows: 10 });
@@ -725,7 +910,7 @@
         return b;
       });
       const lvSel = {};
-      Object.values(MISSIONS).forEach(m => { lvSel[m.id] = sel([[1, 'Nível 1'], [2, 'Nível 2'], [3, 'Nível 3']], lvOf(m.id).lv); });
+      Object.values(MISSIONS).forEach(m => { lvSel[m.id] = sel([[1, 'Nível 1'], [2, 'Nível 2'], [3, 'Nível 3'], [4, 'Nível 4']], lvOf(m.id).lv); });
 
       function saveSettings() {
         settings = Object.assign({}, settings, {
@@ -748,7 +933,9 @@
       }
 
       // registro do dia
-      const fDate = inp({ type: 'date', value: localDate(), max: localDate() });
+      // registro feito de manhã refere-se à noite anterior
+      const nightDefault = () => { const d = logical(); if (new Date().getHours() < 18) d.setDate(d.getDate() - 1); return localDate(d); };
+      const fDate = inp({ type: 'date', value: nightDefault(), max: localDate() });
       const fSleep = inp({ type: 'time' });
       const fScreen = inp({ type: 'number', min: 0, max: 1440, inputmode: 'numeric' });
       const fAtt = sel([['', '—'], 1, 2, 3, 4, 5].map(x => Array.isArray(x) ? x : [x, String(x)]), '');
@@ -780,11 +967,24 @@
 
       // resumo 7 dias
       const rows = Array.from({ length: 7 }, (_, i) => {
-        const x = new Date(); x.setDate(x.getDate() - i);
+        const x = logical(); x.setDate(x.getDate() - i);
         const d = localDate(x), s = dayStats(d);
         return h('tr', null,
-          h('td', null, `${d.slice(8, 10)}/${d.slice(5, 7)}`), h('td', null, s.n), h('td', null, s.acc == null ? '–' : s.acc + '%'),
+          h('td', null, `${d.slice(8, 10)}/${d.slice(5, 7)}`), h('td', null, s.n), h('td', null, s.acc == null ? '–' : s.acc + '%'), h('td', null, s.secs ? (s.secs / 60).toFixed(1) : '–'),
           h('td', null, s.sleep || '–'), h('td', null, s.screen == null ? '–' : s.screen), h('td', null, s.att == null ? '–' : s.att));
+      });
+
+      const prog = Object.values(MISSIONS).map(m => {
+        const s = lvOf(m.id), L = log.filter(x => x.m === m.id), last = L.slice(-5);
+        const c = last.reduce((a, x) => a + x.c, 0), e = last.reduce((a, x) => a + x.e, 0);
+        const sec = last.length ? Math.round(last.reduce((a, x) => a + (+x.s || 0), 0) / last.length) : null;
+        return h('tr', null,
+          h('td', { class: 'l' }, `${m.emoji} ${m.title}`),
+          h('td', null, '●'.repeat(s.lv) + '○'.repeat(MAXLV - s.lv)),
+          h('td', null, L.length),
+          h('td', null, (c + e) ? Math.round(100 * c / (c + e)) + '%' : '–'),
+          h('td', null, sec == null ? '–' : sec + 's'),
+          h('td', null, s.lv >= MAXLV ? 'máx' : `${s.good}/2`));
       });
 
       const wipe = () => {
@@ -803,6 +1003,9 @@
         h('div', { class: 'checks' }, h('label', null, fVoice, 'Voz'), h('label', null, fSound, 'Sons')),
         voices.length ? lab('Voz do guia', fVoiceName) : h('p', { class: 'note' }, 'Nenhuma voz em português encontrada neste aparelho. Instale uma voz pt-BR nas configurações de acessibilidade/voz do sistema.'),
         voices.length ? h('div', { class: 'row' }, h('button', { class: 'btn alt', type: 'button', onclick: testVoice }, '🔊 Testar voz')) : null,
+        h('h2', null, 'Progresso por missão'),
+        h('table', null, h('thead', null, h('tr', null, ['Missão', 'Nível', 'Sess.', 'Acerto*', 'Tempo*', 'Próx.'].map(t => h('th', null, t)))), h('tbody', null, prog)),
+        h('p', { class: 'note' }, '*média das últimas 5 sessões. Sobe de nível com 90%+ numa sessão, ou 80%+ em 2 seguidas (coluna Próx.). Desce com menos de 50% em 2 seguidas. Nível 4 = máximo.'),
         h('h2', null, 'Níveis (ajuste manual)'),
         Object.values(MISSIONS).map(m => lab(`${m.emoji} ${m.title}`, lvSel[m.id])),
         h('div', { class: 'row' }, h('button', { class: 'btn', type: 'button', onclick: saveSettings }, 'Salvar configurações')),
@@ -812,7 +1015,7 @@
         lab('Atenção hoje (1 a 5)', fAtt), lab('Humor / agitação (1 a 5)', fMood), lab('Observação', fNote),
         h('div', { class: 'row' }, h('button', { class: 'btn', type: 'button', onclick: saveDay }, 'Salvar dia')),
         h('h2', null, 'Últimos 7 dias'),
-        h('table', null, h('thead', null, h('tr', null, ['Dia', 'Miss.', 'Acerto', 'Dormiu', 'Tela', 'Aten.'].map(t => h('th', null, t)))), h('tbody', null, rows)),
+        h('table', null, h('thead', null, h('tr', null, ['Dia', 'Miss.', 'Acerto', 'Min', 'Dormiu', 'Tela', 'Aten.'].map(t => h('th', null, t)))), h('tbody', null, rows)),
         h('h2', null, 'Planilha'),
         h('p', { class: 'note' }, 'CSV com ";" e acentos (abre direto no Excel/Google Planilhas em português). Faça backup toda semana: os dados ficam só neste aparelho.'),
         h('div', { class: 'row' },

@@ -135,6 +135,28 @@ th { color: var(--muted); font-weight: 700; }
 .sheet h3 { margin: 0; }
 .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: #fff; color: #0b1026; font-weight: 800; padding: 12px 20px; border-radius: 999px; z-index: 20; }
 
+/* ---------- sossego e respeito ---------- */
+.dragon-wrap { position: relative; display: grid; place-items: center; width: 100%; min-height: 220px; }
+.dragon { font-size: 150px; line-height: 1; }
+.dragon.sleep { animation: snooze 4s ease-in-out infinite; }
+@keyframes snooze { 50% { transform: scale(1.06); } }
+.zzz-zone { position: absolute; inset: 0; pointer-events: none; }
+.zzz { position: absolute; right: 22%; top: 18%; font-size: 36px; font-weight: 900; color: var(--blue); animation: zup 3.5s ease-out forwards; }
+@keyframes zup { from { opacity: 0; transform: translate(0, 20px) scale(.7); } 20% { opacity: 1; } to { opacity: 0; transform: translate(40px, -80px) scale(1.4); } }
+.sleepbar { width: 100%; max-width: 320px; height: 12px; border-radius: 6px; background: rgba(255,255,255,.15); overflow: hidden; }
+.sleepbar span { display: block; height: 100%; width: 0; background: var(--blue); }
+.cell.trail { font-size: clamp(28px, 9vw, 44px); background: rgba(255,255,255,.12); }
+.cell.trail.next { outline: 3px dashed var(--accent); outline-offset: -3px; }
+.cell.trail.filled { background: var(--card); outline: 0; }
+.scene { margin: 0; text-align: center; }
+.choices { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 480px; }
+.choice { display: flex; align-items: center; gap: 14px; min-height: 76px; padding: 10px 18px; border: 0; border-radius: 22px; background: var(--card); color: #fff; text-align: left; font-size: 20px; font-weight: 800; box-shadow: 0 5px 0 rgba(0,0,0,.25); }
+.choice .ce { font-size: 40px; line-height: 1; }
+.choice.right { background: var(--good); color: #06281a; }
+.choice:disabled { opacity: .35; }
+td.l { text-align: left; }
+
 @media (prefers-reduced-motion: reduce) {
-  .confetti, .shake, .pop, .tile.hint { animation: none; }
+  .confetti, .shake, .pop, .tile.hint, .dragon.sleep { animation: none; }
+  .zzz { animation: none; opacity: 1; }
 }
