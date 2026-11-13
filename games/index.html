@@ -70,7 +70,7 @@ button { font-family: inherit; touch-action: manipulation; }
 
 /* central de jogos */
 .hub-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex: none; }
-.hub-btns { display: flex; gap: 8px; flex: none; }
+.gear { font-size: 26px; line-height: 1; min-width: 56px; min-height: 52px; padding: 4px 10px; flex: none; }
 h1 { font-size: clamp(28px, 7.4vw, 40px); line-height: 1.05; margin: 0; font-weight: 700; text-wrap: balance; }
 .hub-grid { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: minmax(128px, 1fr); gap: 12px; padding: 2px 2px 8px; align-content: stretch; }
 .gcard {
@@ -288,9 +288,6 @@ h1 { font-size: clamp(28px, 7.4vw, 40px); line-height: 1.05; margin: 0; font-wei
 .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20; }
 .confetti i { position: absolute; top: -20px; width: 12px; height: 18px; border-radius: 3px; animation: fall linear forwards; }
 @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
-.hub-sort { display: flex; align-items: center; gap: 8px; flex: none; flex-wrap: wrap; }
-.hub-sort .slabel { font-weight: 700; font-size: 15px; color: var(--ink-soft); }
-.hub-sort .chip { min-height: 44px; padding: 6px 14px; }
 .gcard { position: relative; }
 @media (prefers-reduced-motion: reduce) {
   .cell.pop svg, .cell.win svg { animation: none; }
@@ -302,8 +299,7 @@ h1 { font-size: clamp(28px, 7.4vw, 40px); line-height: 1.05; margin: 0; font-wei
 <body>
 <div id="app">
   <section id="hub" class="screen">
-    <div class="hub-head"><h1>Cantinho dos Jogos</h1><div class="hub-btns"><button class="small-btn" id="btnVoz" type="button">Voz</button><button class="small-btn snd" type="button"></button></div></div>
-    <div class="hub-sort" id="hubSort"></div>
+    <div class="hub-head"><h1>Cantinho dos Jogos</h1><button class="small-btn gear" id="btnCfg" type="button" aria-label="Configurações">⚙️</button></div>
     <div class="hub-grid" id="hubGrid"></div>
   </section>
   <section id="gmenu" class="screen" hidden></section>
@@ -1641,8 +1637,10 @@ h1 { font-size: clamp(28px, 7.4vw, 40px); line-height: 1.05; margin: 0; font-wei
   function showSettings() {
     stopGame(); show('settings'); loadVoices();
     var s = $('settings');
-    s.innerHTML = '<div class="topbar"><button class="small-btn" data-a="home" type="button">&larr; Jogos</button><div class="ptitle">Voz</div><button class="small-btn snd" type="button"></button></div>' +
+    s.innerHTML = '<div class="topbar"><button class="small-btn" data-a="home" type="button">&larr; Jogos</button><div class="ptitle">Configurações</div><div></div></div>' +
       '<div class="menu-body"><div class="menu-inner top">' +
+      '<div class="label">Ordenar os jogos</div><div class="chips" id="vSort"></div>' +
+      '<div class="label">Som</div><div class="chips" id="vSnd"></div>' +
       '<div class="label">Voz dos jogos</div><div class="chips" id="vOn"></div>' +
       '<div class="label">Qual voz</div><select class="sel" id="vSel" aria-label="Qual voz"></select>' +
       '<div class="label">Velocidade</div><div class="chips" id="vRate"></div>' +
@@ -1656,6 +1654,8 @@ h1 { font-size: clamp(28px, 7.4vw, 40px); line-height: 1.05; margin: 0; font-wei
         box.appendChild(b);
       });
     }
+    chipsFor('vSort', SORTS.map(function (x) { return [x[1], x[0]]; }), function (v) { return cfg.sort === v; }, function (v) { cfg.sort = v; saveCfg(); renderHub(); });
+    chipsFor('vSnd', [['Ligado', true], ['Desligado', false]], function (v) { return cfg.sound === v; }, function (v) { cfg.sound = v; if (!v) stopSpeech(); saveCfg(); updateSnd(); });
     chipsFor('vOn', [['Ligada', true], ['Desligada', false]], function (v) { return cfg.voice === v; }, function (v) { cfg.voice = v; saveCfg(); });
     chipsFor('vRate', [['Devagar', 0.8], ['Normal', 0.95]], function (v) { return cfg.rate === v; }, function (v) { cfg.rate = v; saveCfg(); speak('Olá! Vamos brincar?'); });
     var sel = $('vSel'), auto = autoVoice(), tip = $('vTip');
@@ -1676,13 +1676,12 @@ h1 { font-size: clamp(28px, 7.4vw, 40px); line-height: 1.05; margin: 0; font-wei
       !auto ? 'Só encontrei vozes de Portugal. Instale a voz Português (Brasil) do aparelho para um sotaque brasileiro.' :
       'Se a voz ainda soar robótica, escolha outra na lista. As melhores costumam ter “Google”, “Natural” ou “Premium” no nome.';
     s.querySelector('[data-a="home"]').addEventListener('click', showHub);
-    s.querySelector('.snd').addEventListener('click', function () { cfg.sound = !cfg.sound; if (!cfg.sound) stopSpeech(); saveCfg(); updateSnd(); });
     updateSnd();
   }
-  $('btnVoz').addEventListener('click', showSettings);
+  $('btnCfg').addEventListener('click', showSettings);
 
   /* ---------- ordenar os jogos ---------- */
-  var grid = $('hubGrid'), sortBox = $('hubSort');
+  var grid = $('hubGrid');
   var plays = {};
   try { plays = JSON.parse(localStorage.getItem('cantinho.plays') || '{}') || {}; } catch (e) { plays = {}; }
   function countPlay(g) { plays[g.id] = (plays[g.id] || 0) + 1; try { localStorage.setItem('cantinho.plays', JSON.stringify(plays)); } catch (e) {} }
@@ -1703,15 +1702,6 @@ h1 { font-size: clamp(28px, 7.4vw, 40px); line-height: 1.05; margin: 0; font-wei
     });
     grid.scrollTop = 0;
   }
-  sortBox.innerHTML = '<span class="slabel">Ordenar</span>';
-  SORTS.forEach(function (s) {
-    var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = s[1]; b.setAttribute('aria-pressed', String(cfg.sort === s[0]));
-    b.addEventListener('click', function () {
-      cfg.sort = s[0]; saveCfg(); renderHub();
-      sortBox.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c === b)); });
-    });
-    sortBox.appendChild(b);
-  });
   renderHub();
   updateSnd(); show('hub');
   if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
